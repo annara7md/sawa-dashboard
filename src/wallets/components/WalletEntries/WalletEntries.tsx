@@ -1,7 +1,7 @@
-import { Card, CardContent, CardHeader } from "@dashboard/components/Card";
-import { Skeleton } from "@dashboard/components/Skeleton";
-import { TableBody, TableCell, TableHead, TableRow } from "@dashboard/components/TableRowLink";
-import { Box, Button, Text } from "@saleor/macaw-ui-next";
+import { DashboardCard } from "@dashboard/components/Card";
+import TableRowLink from "@dashboard/components/TableRowLink";
+import { Table, TableBody, TableCell, TableHead } from "@material-ui/core";
+import { Box, Button, Skeleton, Text } from "@saleor/macaw-ui-next";
 import { useIntl } from "react-intl";
 
 import { type Wallet, WalletEntryType } from "../../types";
@@ -23,19 +23,23 @@ export const WalletEntries = ({
 
   if (loading) {
     return (
-      <Card>
-        <CardHeader
-          title={<Skeleton />}
-          toolbar={<Skeleton />}
-        />
-        <CardContent>
+      <DashboardCard>
+        <DashboardCard.Header>
+          <DashboardCard.Title>
+            <Skeleton />
+          </DashboardCard.Title>
+          <DashboardCard.Toolbar>
+            <Skeleton />
+          </DashboardCard.Toolbar>
+        </DashboardCard.Header>
+        <DashboardCard.Content>
           <Box display="flex" flexDirection="column" gap={2}>
             {[1, 2, 3].map(i => (
               <Skeleton key={i} />
             ))}
           </Box>
-        </CardContent>
-      </Card>
+        </DashboardCard.Content>
+      </DashboardCard>
     );
   }
 
@@ -75,14 +79,14 @@ export const WalletEntries = ({
     switch (type) {
       case WalletEntryType.CREDIT:
       case WalletEntryType.REFUND:
-        return "textSuccessDefault";
+        return "success1";
       case WalletEntryType.DEBIT:
-        return "textCriticalDefault";
+        return "critical1";
       case WalletEntryType.RESERVE:
       case WalletEntryType.ADJUSTMENT:
-        return "textWarningDefault";
+        return "warning1";
       default:
-        return "textNeutralDefault";
+        return "default2";
     }
   };
 
@@ -106,13 +110,15 @@ export const WalletEntries = ({
   };
 
   return (
-    <Card>
-      <CardHeader
-        title={intl.formatMessage({
-          id: "wallet.entries.title",
-          defaultMessage: "Recent Transactions",
-        })}
-        toolbar={
+    <DashboardCard>
+      <DashboardCard.Header>
+        <DashboardCard.Title>
+          {intl.formatMessage({
+            id: "wallet.entries.title",
+            defaultMessage: "Recent Transactions",
+          })}
+        </DashboardCard.Title>
+        <DashboardCard.Toolbar>
           <Box display="flex" gap={2}>
             <Button variant="secondary" size="small" onClick={onManualAdjustment}>
               {intl.formatMessage({
@@ -127,12 +133,12 @@ export const WalletEntries = ({
               })}
             </Button>
           </Box>
-        }
-      />
-      <CardContent>
+        </DashboardCard.Toolbar>
+      </DashboardCard.Header>
+      <DashboardCard.Content>
         {mockEntries.length === 0 ? (
           <Box padding={4} textAlign="center">
-            <Text color="textNeutralSubdued">
+            <Text color="default2">
               {intl.formatMessage({
                 id: "wallet.entries.empty",
                 defaultMessage: "No transactions found",
@@ -140,9 +146,9 @@ export const WalletEntries = ({
             </Text>
           </Box>
         ) : (
-          <Box>
+          <Table>
             <TableHead>
-              <TableRow>
+              <TableRowLink>
                 <TableCell>
                   {intl.formatMessage({
                     id: "wallet.entries.type",
@@ -173,18 +179,18 @@ export const WalletEntries = ({
                     defaultMessage: "Date",
                   })}
                 </TableCell>
-              </TableRow>
+              </TableRowLink>
             </TableHead>
             <TableBody>
-              {mockEntries.map((entry) => (
-                <TableRow key={entry.id}>
+              {mockEntries.map(entry => (
+                <TableRowLink key={entry.id}>
                   <TableCell>
                     <Text color={getEntryTypeColor(entry.entryType)}>
                       {getEntryTypeLabel(entry.entryType)}
                     </Text>
                   </TableCell>
                   <TableCell>
-                    <Text color={entry.amount.amount >= 0 ? "textSuccessDefault" : "textCriticalDefault"}>
+                    <Text color={entry.amount.amount >= 0 ? "success1" : "critical1"}>
                       {entry.amount.amount >= 0 ? "+" : ""}
                       {entry.amount.amount.toFixed(2)} {entry.amount.currency}
                     </Text>
@@ -198,12 +204,12 @@ export const WalletEntries = ({
                   <TableCell>
                     {new Date(entry.createdAt).toLocaleDateString()}
                   </TableCell>
-                </TableRow>
+                </TableRowLink>
               ))}
             </TableBody>
-          </Box>
+          </Table>
         )}
-      </CardContent>
-    </Card>
+      </DashboardCard.Content>
+    </DashboardCard>
   );
 };

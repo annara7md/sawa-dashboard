@@ -22,9 +22,49 @@ import WalletDetailsViewComponent from "./views/WalletDetails";
 import WalletListViewComponent from "./views/WalletList";
 import WalletTopUpRequestListViewComponent from "./views/WalletTopUpRequestList";
 
+export const parseWalletListSortParams = (qs: Record<string, string>) => {
+  try {
+    return asSortParams(
+      qs,
+      WalletListUrlSortField,
+      WalletListUrlSortField.createdAt,
+      false,
+    );
+  } catch {
+    const { sort: _sort, asc: _asc, ...rest } = qs;
+
+    return asSortParams(
+      rest,
+      WalletListUrlSortField,
+      WalletListUrlSortField.createdAt,
+      false,
+    );
+  }
+};
+
+export const parseWalletTopUpRequestListSortParams = (qs: Record<string, string>) => {
+  try {
+    return asSortParams(
+      qs,
+      WalletTopUpRequestListUrlSortField,
+      WalletTopUpRequestListUrlSortField.createdAt,
+      false,
+    );
+  } catch {
+    const { sort: _sort, asc: _asc, ...rest } = qs;
+
+    return asSortParams(
+      rest,
+      WalletTopUpRequestListUrlSortField,
+      WalletTopUpRequestListUrlSortField.createdAt,
+      false,
+    );
+  }
+};
+
 const WalletListView = () => {
   const qs = parseQs(location.search.substr(1)) as any;
-  const params: WalletListUrlQueryParams = asSortParams(qs, WalletListUrlSortField);
+  const params: WalletListUrlQueryParams = parseWalletListSortParams(qs);
 
   return <WalletListViewComponent params={params} />;
 };
@@ -45,10 +85,7 @@ const WalletDetailsView = ({
 
 const WalletTopUpRequestListView = () => {
   const qs = parseQs(location.search.substr(1)) as any;
-  const params: WalletTopUpRequestListUrlQueryParams = asSortParams(
-    qs,
-    WalletTopUpRequestListUrlSortField,
-  );
+  const params: WalletTopUpRequestListUrlQueryParams = parseWalletTopUpRequestListSortParams(qs);
 
   return <WalletTopUpRequestListViewComponent params={params} />;
 };

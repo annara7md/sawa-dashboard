@@ -1,7 +1,7 @@
-import { Card, CardContent, CardHeader } from "@dashboard/components/Card";
-import { Skeleton } from "@dashboard/components/Skeleton";
-import { TableBody, TableCell, TableHead, TableRow } from "@dashboard/components/TableRowLink";
-import { Box, Text } from "@saleor/macaw-ui-next";
+import { DashboardCard } from "@dashboard/components/Card";
+import TableRowLink from "@dashboard/components/TableRowLink";
+import { Table, TableBody, TableCell, TableHead } from "@material-ui/core";
+import { Box, Skeleton, Text } from "@saleor/macaw-ui-next";
 import { useIntl } from "react-intl";
 
 import { type Wallet, WalletEventType } from "../../types";
@@ -16,16 +16,20 @@ export const WalletEvents = ({ wallet, loading }: WalletEventsProps) => {
 
   if (loading) {
     return (
-      <Card>
-        <CardHeader title={<Skeleton />} />
-        <CardContent>
+      <DashboardCard>
+        <DashboardCard.Header>
+          <DashboardCard.Title>
+            <Skeleton />
+          </DashboardCard.Title>
+        </DashboardCard.Header>
+        <DashboardCard.Content>
           <Box display="flex" flexDirection="column" gap={2}>
             {[1, 2, 3].map(i => (
               <Skeleton key={i} />
             ))}
           </Box>
-        </CardContent>
-      </Card>
+        </DashboardCard.Content>
+      </DashboardCard>
     );
   }
 
@@ -91,31 +95,33 @@ export const WalletEvents = ({ wallet, loading }: WalletEventsProps) => {
       case WalletEventType.CREDITED:
       case WalletEventType.REFUNDED:
       case WalletEventType.TOPUP_APPROVED:
-        return "textSuccessDefault";
+        return "success1";
       case WalletEventType.DEBITED:
       case WalletEventType.TOPUP_REJECTED:
-        return "textCriticalDefault";
+        return "critical1";
       case WalletEventType.RESERVED:
       case WalletEventType.TOPUP_REQUESTED:
       case WalletEventType.MANUAL_ADJUSTMENT:
-        return "textWarningDefault";
+        return "warning1";
       default:
-        return "textNeutralDefault";
+        return "default2";
     }
   };
 
   return (
-    <Card>
-      <CardHeader
-        title={intl.formatMessage({
-          id: "wallet.events.title",
-          defaultMessage: "Recent Activity",
-        })}
-      />
-      <CardContent>
+    <DashboardCard>
+      <DashboardCard.Header>
+        <DashboardCard.Title>
+          {intl.formatMessage({
+            id: "wallet.events.title",
+            defaultMessage: "Recent Activity",
+          })}
+        </DashboardCard.Title>
+      </DashboardCard.Header>
+      <DashboardCard.Content>
         {mockEvents.length === 0 ? (
           <Box padding={4} textAlign="center">
-            <Text color="textNeutralSubdued">
+            <Text color="default2">
               {intl.formatMessage({
                 id: "wallet.events.empty",
                 defaultMessage: "No activity found",
@@ -123,9 +129,9 @@ export const WalletEvents = ({ wallet, loading }: WalletEventsProps) => {
             </Text>
           </Box>
         ) : (
-          <Box>
+          <Table>
             <TableHead>
-              <TableRow>
+              <TableRowLink>
                 <TableCell>
                   {intl.formatMessage({
                     id: "wallet.events.type",
@@ -150,11 +156,11 @@ export const WalletEvents = ({ wallet, loading }: WalletEventsProps) => {
                     defaultMessage: "Date",
                   })}
                 </TableCell>
-              </TableRow>
+              </TableRowLink>
             </TableHead>
             <TableBody>
-              {mockEvents.map((event) => (
-                <TableRow key={event.id}>
+              {mockEvents.map(event => (
+                <TableRowLink key={event.id}>
                   <TableCell>
                     <Text color={getEventTypeColor(event.type)}>
                       {getEventTypeLabel(event.type)}
@@ -164,25 +170,25 @@ export const WalletEvents = ({ wallet, loading }: WalletEventsProps) => {
                     {event.user ? (
                       <Text>{event.user.email}</Text>
                     ) : event.app ? (
-                      <Text color="textNeutralSubdued">{event.app.name}</Text>
+                      <Text color="default2">{event.app.name}</Text>
                     ) : (
-                      <Text color="textNeutralSubdued">System</Text>
+                      <Text color="default2">System</Text>
                     )}
                   </TableCell>
                   <TableCell>
                     <Box display="flex" flexDirection="column" gap={1}>
                       {event.parameters.amount && (
-                        <Text variant="caption">
+                        <Text size={2} color="default2">
                           Amount: {event.parameters.amount} {event.parameters.currency}
                         </Text>
                       )}
                       {event.parameters.orderId && (
-                        <Text variant="caption">
+                        <Text size={2} color="default2">
                           Order: {event.parameters.orderId}
                         </Text>
                       )}
                       {event.parameters.requestId && (
-                        <Text variant="caption">
+                        <Text size={2} color="default2">
                           Request: {event.parameters.requestId}
                         </Text>
                       )}
@@ -191,12 +197,12 @@ export const WalletEvents = ({ wallet, loading }: WalletEventsProps) => {
                   <TableCell>
                     {new Date(event.date).toLocaleString()}
                   </TableCell>
-                </TableRow>
+                </TableRowLink>
               ))}
             </TableBody>
-          </Box>
+          </Table>
         )}
-      </CardContent>
-    </Card>
+      </DashboardCard.Content>
+    </DashboardCard>
   );
 };

@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 
-import { walletFragment, walletTopUpRequestFragment } from "./fragments";
+import { walletFragment, walletTopUpRequestFragment } from "../fragments/wallets";
 
 // Approve top-up request
 export const walletTopUpApproveMutation = gql`

@@ -61,4 +61,10 @@ describe("useListSettings", () => {
       ...defaultListSettings[key],
     });
   });
+
+  it("provides defaults for wallet list settings", () => {
+    const { result } = renderHook(() => useListSettings(ListViews.WALLET_LIST));
+
+    expect(result.current.settings).toStrictEqual(defaultListSettings[ListViews.WALLET_LIST]);
+  });
 });

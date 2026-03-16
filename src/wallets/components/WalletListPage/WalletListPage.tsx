@@ -14,7 +14,11 @@ import { useIntl } from "react-intl";
 import { type Wallet } from "../../types";
 import { type WalletListUrlSortField } from "../../urls";
 import { WalletListDatagrid } from "../WalletListDatagrid/WalletListDatagrid";
-import { type WalletFilterKeys, type WalletListFilterOpts } from "./filters";
+import {
+  createFilterStructure,
+  type WalletFilterKeys,
+  type WalletListFilterOpts,
+} from "./filters";
 
 interface WalletListPageProps
   extends PageListProps,
@@ -36,12 +40,16 @@ const WalletListPage = ({
   onFilterPresetChange,
   onFilterPresetPresetSave,
   filterPresets,
+  filterOpts,
   selectedWalletIds,
+  onSelectWalletIds,
   hasPresetsChanged,
+  onFilterChange,
   ...walletListProps
 }: WalletListPageProps) => {
   const intl = useIntl();
   const [isFilterPresetOpen, setFilterPresetOpen] = useState(false);
+  const filterStructure = createFilterStructure(intl, filterOpts);
 
   return (
     <>
@@ -74,13 +82,14 @@ const WalletListPage = ({
       </TopNav>
       <Box>
         <ListFilters
-          type="expression-filter"
           initialSearch={initialSearch}
           searchPlaceholder={intl.formatMessage({
             id: "wallets.search.placeholder",
             defaultMessage: "Search wallets...",
           })}
           onSearchChange={onSearchChange}
+          filterStructure={filterStructure}
+          onFilterChange={onFilterChange}
         />
         <WalletListDatagrid
           {...walletListProps}

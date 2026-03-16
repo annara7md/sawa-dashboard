@@ -4,7 +4,7 @@ import {
   walletDetailsFragment,
   walletFragment,
   walletTopUpRequestFragment,
-} from "./fragments";
+} from "../fragments/wallets";
 
 // List all wallets (staff only)
 export const walletListQuery = gql`

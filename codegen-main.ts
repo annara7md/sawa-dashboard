@@ -5,11 +5,13 @@ const config: CodegenConfig = {
   documents: [
     "./src/**/queries.ts",
     "./src/**/mutations.ts",
+    "./src/**/fragments.ts",
     "./src/**/fragments/*.ts",
     "./src/searches/*.ts",
     // covered by codegen-staging
     "!./src/**/queries.staging.ts",
     "!./src/**/mutations.staging.ts",
+    "!./src/**/fragments.staging.ts",
     "!./src/**/fragments/*.staging.ts",
     "!./src/searches/*.staging.ts",
   ],

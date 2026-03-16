@@ -6,6 +6,7 @@ const config: CodegenConfig = {
   documents: [
     "./src/**/queries.staging.ts",
     "./src/**/mutations.staging.ts",
+    "./src/**/fragments.staging.ts",
     "./src/**/fragments/*.staging.ts",
     "./src/searches/*.staging.ts",
   ],

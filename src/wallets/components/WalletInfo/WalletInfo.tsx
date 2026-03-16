@@ -1,6 +1,5 @@
-import { Card, CardContent, CardHeader } from "@dashboard/components/Card";
-import { Skeleton } from "@dashboard/components/Skeleton";
-import { Box, Text } from "@saleor/macaw-ui-next";
+import { DashboardCard } from "@dashboard/components/Card";
+import { Box, Skeleton, Text } from "@saleor/macaw-ui-next";
 import { useIntl } from "react-intl";
 
 import { type Wallet } from "../../types";
@@ -15,13 +14,13 @@ export const WalletInfo = ({ wallet, loading }: WalletInfoProps) => {
 
   if (loading) {
     return (
-      <Card>
-        <CardHeader
-          title={
+      <DashboardCard>
+        <DashboardCard.Header>
+          <DashboardCard.Title>
             <Skeleton />
-          }
-        />
-        <CardContent>
+          </DashboardCard.Title>
+        </DashboardCard.Header>
+        <DashboardCard.Content>
           <Box display="flex" flexDirection="column" gap={3}>
             {[1, 2, 3, 4].map(i => (
               <Box key={i}>
@@ -30,8 +29,8 @@ export const WalletInfo = ({ wallet, loading }: WalletInfoProps) => {
               </Box>
             ))}
           </Box>
-        </CardContent>
-      </Card>
+        </DashboardCard.Content>
+      </DashboardCard>
     );
   }
 
@@ -78,27 +77,29 @@ export const WalletInfo = ({ wallet, loading }: WalletInfoProps) => {
   ];
 
   return (
-    <Card>
-      <CardHeader
-        title={intl.formatMessage({
-          id: "wallet.info.title",
-          defaultMessage: "Wallet Information",
-        })}
-      />
-      <CardContent>
+    <DashboardCard>
+      <DashboardCard.Header>
+        <DashboardCard.Title>
+          {intl.formatMessage({
+            id: "wallet.info.title",
+            defaultMessage: "Wallet Information",
+          })}
+        </DashboardCard.Title>
+      </DashboardCard.Header>
+      <DashboardCard.Content>
         <Box display="flex" flexDirection="column" gap={3}>
           {infoItems.map((item, index) => (
             <Box key={index}>
-              <Text variant="caption" color="textNeutralSubdued">
+              <Text size={2} color="default2">
                 {item.label}
               </Text>
-              <Text variant="bodyStrong" marginTop={1}>
+              <Text size={3} fontWeight="bold" marginTop={1} display="block">
                 {item.value}
               </Text>
             </Box>
           ))}
         </Box>
-      </CardContent>
-    </Card>
+      </DashboardCard.Content>
+    </DashboardCard>
   );
 };

@@ -17,6 +17,7 @@ interface WalletDetailsPageProps {
   wallet: Wallet | undefined;
   loading: boolean;
   saveButtonBarState: ConfirmButtonTransitionState;
+  backHref: string;
   onBack: () => void;
   onSubmit: () => void;
   onManualAdjustment: () => void;
@@ -27,6 +28,7 @@ export const WalletDetailsPage = ({
   wallet,
   loading,
   saveButtonBarState,
+  backHref,
   onBack,
   onSubmit,
   onManualAdjustment,
@@ -37,7 +39,7 @@ export const WalletDetailsPage = ({
   if (!wallet && !loading) {
     return (
       <Box padding={4}>
-        <Text variant="heading" size="medium">
+        <Text size={5} fontWeight="bold">
           {intl.formatMessage({
             id: "wallet.notFound",
             defaultMessage: "Wallet not found",
@@ -50,7 +52,7 @@ export const WalletDetailsPage = ({
   return (
     <DetailPageLayout>
       <TopNav
-        href="#"
+        href={backHref}
         title={
           wallet
             ? `${wallet.user.firstName} ${wallet.user.lastName} - ${wallet.currency} Wallet`
@@ -59,11 +61,10 @@ export const WalletDetailsPage = ({
                 defaultMessage: "Wallet Details",
               })
         }
-        onBack={onBack}
       />
       
       <DetailPageLayout.Content>
-        <Box display="grid" gridTemplateColumns="2fr 1fr" gap={6}>
+        <Box display="grid" __gridTemplateColumns="2fr 1fr" gap={6}>
           <Box display="flex" flexDirection="column" gap={6}>
             {/* Wallet Statistics */}
             <WalletStats wallet={wallet} loading={loading} />

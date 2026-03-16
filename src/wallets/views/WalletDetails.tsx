@@ -71,6 +71,7 @@ const WalletDetails = ({ id, params }: WalletDetailsProps) => {
         wallet={wallet}
         loading={loading}
         saveButtonBarState={saveButtonBarState}
+        backHref={walletListUrl()}
         onBack={handleBack}
         onSubmit={handleSubmit}
         onManualAdjustment={handleManualAdjustment}

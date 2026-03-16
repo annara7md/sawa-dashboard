@@ -1,6 +1,5 @@
-import { Card, CardContent } from "@dashboard/components/Card";
-import { Skeleton } from "@dashboard/components/Skeleton";
-import { Box, Text } from "@saleor/macaw-ui-next";
+import { DashboardCard } from "@dashboard/components/Card";
+import { Box, Skeleton, Text } from "@saleor/macaw-ui-next";
 import { useIntl } from "react-intl";
 
 import { type Wallet } from "../../types";
@@ -15,9 +14,9 @@ export const WalletStats = ({ wallet, loading }: WalletStatsProps) => {
 
   if (loading) {
     return (
-      <Card>
-        <CardContent>
-          <Box display="grid" gridTemplateColumns="repeat(3, 1fr)" gap={4}>
+      <DashboardCard>
+        <DashboardCard.Content>
+          <Box display="grid" __gridTemplateColumns="repeat(3, 1fr)" gap={4}>
             {[1, 2, 3].map(i => (
               <Box key={i} textAlign="center">
                 <Skeleton />
@@ -25,8 +24,8 @@ export const WalletStats = ({ wallet, loading }: WalletStatsProps) => {
               </Box>
             ))}
           </Box>
-        </CardContent>
-      </Card>
+        </DashboardCard.Content>
+      </DashboardCard>
     );
   }
 
@@ -41,7 +40,6 @@ export const WalletStats = ({ wallet, loading }: WalletStatsProps) => {
         defaultMessage: "Current Balance",
       }),
       value: `${wallet.currentBalance.amount.toFixed(2)} ${wallet.currentBalance.currency}`,
-      color: "default" as const,
     },
     {
       label: intl.formatMessage({
@@ -49,7 +47,6 @@ export const WalletStats = ({ wallet, loading }: WalletStatsProps) => {
         defaultMessage: "Reserved Balance",
       }),
       value: `${wallet.reservedBalance.amount.toFixed(2)} ${wallet.reservedBalance.currency}`,
-      color: "warning" as const,
     },
     {
       label: intl.formatMessage({
@@ -57,15 +54,14 @@ export const WalletStats = ({ wallet, loading }: WalletStatsProps) => {
         defaultMessage: "Spendable Balance",
       }),
       value: `${wallet.spendableBalance.amount.toFixed(2)} ${wallet.spendableBalance.currency}`,
-      color: "success" as const,
     },
   ];
 
   return (
-    <Card>
-      <CardContent>
+    <DashboardCard>
+      <DashboardCard.Content>
         <Box marginBottom={4}>
-          <Text variant="heading" size="small">
+          <Text size={5} fontWeight="bold">
             {intl.formatMessage({
               id: "wallet.stats.title",
               defaultMessage: "Wallet Balance",
@@ -73,28 +69,37 @@ export const WalletStats = ({ wallet, loading }: WalletStatsProps) => {
           </Text>
         </Box>
         
-        <Box display="grid" gridTemplateColumns="repeat(3, 1fr)" gap={4}>
+        <Box display="grid" __gridTemplateColumns="repeat(3, 1fr)" gap={4}>
           {stats.map((stat, index) => (
-            <Box key={index} textAlign="center" padding={3} borderRadius={2} backgroundColor="surfaceNeutralSubdued">
-              <Text variant="caption" color="textNeutralSubdued">
+            <Box key={index} textAlign="center" padding={3} borderRadius={2} backgroundColor="default2">
+              <Text size={2} color="default2">
                 {stat.label}
               </Text>
-              <Text variant="heading" size="medium" marginTop={1}>
+              <Text size={5} fontWeight="bold" marginTop={1} display="block">
                 {stat.value}
               </Text>
             </Box>
           ))}
         </Box>
         
-        <Box marginTop={4} padding={3} borderRadius={2} backgroundColor={wallet.isActive ? "surfaceSuccessSubdued" : "surfaceCriticalSubdued"}>
+        <Box
+          marginTop={4}
+          padding={3}
+          borderRadius={2}
+          backgroundColor={wallet.isActive ? "success1" : "critical1"}
+        >
           <Box display="flex" alignItems="center" justifyContent="space-between">
-            <Text variant="bodyStrong">
+            <Text size={3} fontWeight="bold" color="default1">
               {intl.formatMessage({
                 id: "wallet.stats.status",
                 defaultMessage: "Status",
               })}
             </Text>
-            <Text variant="bodyStrong" color={wallet.isActive ? "textSuccessDefault" : "textCriticalDefault"}>
+            <Text
+              size={3}
+              fontWeight="bold"
+              color="default1"
+            >
               {wallet.isActive
                 ? intl.formatMessage({
                     id: "wallet.status.active",
@@ -107,7 +112,7 @@ export const WalletStats = ({ wallet, loading }: WalletStatsProps) => {
             </Text>
           </Box>
         </Box>
-      </CardContent>
-    </Card>
+      </DashboardCard.Content>
+    </DashboardCard>
   );
 };
