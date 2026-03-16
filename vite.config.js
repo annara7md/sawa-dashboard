@@ -30,6 +30,7 @@ const copyOgImage = () => ({
 export default defineConfig(({ command, mode }) => {
   const isDev = command !== "build";
   const env = loadEnv(mode, process.cwd(), "");
+  const enableCodeInspector = isDev && env.VITE_ENABLE_CODE_INSPECTOR === "true";
   /*
     Using explicit env variables, there is no need to expose all of them (security).
   */
@@ -71,9 +72,6 @@ export default defineConfig(({ command, mode }) => {
 
   const plugins = [
     react(),
-    CodeInspectorPlugin({
-      bundler: "vite",
-    }),
     createHtmlPlugin({
       entry: path.resolve(__dirname, "src", "index.tsx"),
       template: "index.html",
@@ -96,6 +94,16 @@ export default defineConfig(({ command, mode }) => {
     copyOgImage(),
     copyNoopSW(),
   ];
+
+  if (enableCodeInspector) {
+    plugins.splice(
+      1,
+      0,
+      CodeInspectorPlugin({
+        bundler: "vite",
+      }),
+    );
+  }
 
   if (!isDev) {
     console.log("Enabling service worker...");

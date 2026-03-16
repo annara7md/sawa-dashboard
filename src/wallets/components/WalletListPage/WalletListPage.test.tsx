@@ -57,4 +57,48 @@ describe("WalletListPage", () => {
 
     expect(screen.getByPlaceholderText("Search wallets...")).toBeInTheDocument();
   });
+
+  it("renders an error state instead of the empty datagrid when wallets fail to load", () => {
+    render(
+      <IntlProvider locale="en" messages={{}}>
+        <WalletListPage
+          selectedFilterPreset={0}
+          filterOpts={{
+            currency: { active: false, value: [] },
+            isActive: { active: false, value: false },
+            userId: { active: false, value: "" },
+          }}
+          filterPresets={[]}
+          initialSearch=""
+          onSearchChange={jest.fn()}
+          onFilterChange={jest.fn()}
+          onFilterPresetsAll={jest.fn()}
+          onFilterPresetChange={jest.fn()}
+          onFilterPresetDelete={jest.fn()}
+          onFilterPresetUpdate={jest.fn()}
+          onFilterPresetPresetSave={jest.fn()}
+          hasPresetsChanged={() => false}
+          wallets={[]}
+          settings={{ rowNumber: 20 }}
+          disabled={false}
+          loading={false}
+          error={new Error("Permission denied")}
+          onUpdateListSettings={jest.fn()}
+          onSort={jest.fn()}
+          selectedWallet={undefined}
+          selectedWalletIds={[]}
+          onSelectWalletIds={jest.fn()}
+          onAddCredit={jest.fn()}
+          onManualAdjustment={jest.fn()}
+          onRefund={jest.fn()}
+          onToggleActive={jest.fn()}
+          walletActionLoading={false}
+          sort={{ asc: true, sort: "createdAt" }}
+        />
+      </IntlProvider>,
+    );
+
+    expect(screen.getByText("Unable to load wallets")).toBeInTheDocument();
+    expect(screen.getByText("Permission denied")).toBeInTheDocument();
+  });
 });

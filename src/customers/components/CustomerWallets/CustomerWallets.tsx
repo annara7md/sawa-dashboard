@@ -78,6 +78,7 @@ export const CustomerWallets = ({ customer, loading: customerLoading }: Customer
   const {
     wallets,
     loading: walletsLoading,
+    error,
     refetch,
   } = useCustomerWallets({
     userId: customer?.id || "",
@@ -138,7 +139,19 @@ export const CustomerWallets = ({ customer, loading: customerLoading }: Customer
           </Text>
         </Box>
 
-        {wallets.length === 0 ? (
+        {error ? (
+          <Box padding={4}>
+            <Box display="flex" flexDirection="column" gap={2}>
+              <Text size={4}>
+                {intl.formatMessage({
+                  id: "YBkvbA",
+                  defaultMessage: "Unable to load customer wallets",
+                })}
+              </Text>
+              <Text size={2}>{error.message}</Text>
+            </Box>
+          </Box>
+        ) : wallets.length === 0 ? (
           <Box padding={4} __textAlign="center">
             <Text>
               {intl.formatMessage({

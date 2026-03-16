@@ -18,6 +18,7 @@ import { useIntl } from "react-intl";
 import WalletListPage from "../components/WalletListPage/WalletListPage";
 import { useWalletActionHandlers } from "../hooks/useWalletActionHandlers";
 import { useWalletList } from "../hooks/useWalletList";
+import { buildWalletListFilter, buildWalletListSort } from "../queryVariables";
 import { walletListUrl, type WalletListUrlQueryParams } from "../urls";
 import { getFilterOpts, getFilterQueryParam } from "./WalletList/filters";
 
@@ -44,21 +45,13 @@ const WalletList = ({ params }: WalletListProps) => {
   const queryVariables = useMemo(
     () => ({
       ...paginationState,
-      filter: {
-        query: params.query,
-        currency: params.currency,
-        isActive:
-          params.isActive === "true" ? true : params.isActive === "false" ? false : undefined,
-      },
-      sortBy: {
-        field: params.sort || "CREATED_AT",
-        direction: params.asc ? "ASC" : "DESC",
-      },
+      filter: buildWalletListFilter(params),
+      sortBy: buildWalletListSort(params.asc),
     }),
     [params, paginationState],
   );
 
-  const { wallets, loading, pageInfo, refetch } = useWalletList(queryVariables);
+  const { wallets, loading, error, pageInfo, refetch } = useWalletList(queryVariables);
   const selectedWallet = wallets?.find(wallet => wallet.id === selectedRowIds?.[0]);
   const {
     handleAddCredit,
@@ -125,6 +118,7 @@ const WalletList = ({ params }: WalletListProps) => {
         onFilterPresetPresetSave={() => {}}
         hasPresetsChanged={() => false}
         wallets={wallets || []}
+        error={error}
         settings={settings}
         disabled={loading}
         loading={loading}

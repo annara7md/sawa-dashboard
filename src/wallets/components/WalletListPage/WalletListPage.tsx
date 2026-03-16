@@ -22,6 +22,7 @@ interface WalletListPageProps
     FilterPagePropsWithPresets<WalletFilterKeys, WalletListFilterOpts>,
     SortPage<WalletListUrlSortField> {
   wallets: Wallet[] | undefined;
+  error?: Error;
   selectedWallet?: Wallet;
   selectedWalletIds: string[];
   loading: boolean;
@@ -44,6 +45,7 @@ const WalletListPage = ({
   onFilterPresetPresetSave,
   filterPresets,
   filterOpts,
+  error,
   selectedWallet,
   selectedWalletIds,
   onSelectWalletIds,
@@ -106,11 +108,23 @@ const WalletListPage = ({
             />
           }
         />
-        <WalletListDatagrid
-          {...walletListProps}
-          hasRowHover={!isFilterPresetOpen}
-          onSelectWalletIds={onSelectWalletIds}
-        />
+        {error ? (
+          <Box padding={6} display="flex" flexDirection="column" gap={2}>
+            <Box fontWeight="bold">
+              {intl.formatMessage({
+                id: "NotXh5",
+                defaultMessage: "Unable to load wallets",
+              })}
+            </Box>
+            <Box color="default2">{error.message}</Box>
+          </Box>
+        ) : (
+          <WalletListDatagrid
+            {...walletListProps}
+            hasRowHover={!isFilterPresetOpen}
+            onSelectWalletIds={onSelectWalletIds}
+          />
+        )}
       </Box>
     </>
   );

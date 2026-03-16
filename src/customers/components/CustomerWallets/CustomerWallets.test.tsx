@@ -127,6 +127,7 @@ describe("CustomerWallets", () => {
     useCustomerWallets.mockReturnValue({
       wallets: [],
       loading: false,
+      error: undefined,
       refetch: refetchMock,
     });
 
@@ -137,5 +138,23 @@ describe("CustomerWallets", () => {
     );
 
     expect(screen.getByText("No wallets found for this customer")).toBeInTheDocument();
+  });
+
+  it("renders an error state when customer wallets fail to load", () => {
+    useCustomerWallets.mockReturnValue({
+      wallets: [],
+      loading: false,
+      error: new Error("Permission denied"),
+      refetch: refetchMock,
+    });
+
+    render(
+      <IntlProvider locale="en" messages={{}}>
+        <CustomerWallets customer={customer} />
+      </IntlProvider>,
+    );
+
+    expect(screen.getByText("Unable to load customer wallets")).toBeInTheDocument();
+    expect(screen.getByText("Permission denied")).toBeInTheDocument();
   });
 });
