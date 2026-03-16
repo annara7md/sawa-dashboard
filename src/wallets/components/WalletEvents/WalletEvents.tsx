@@ -37,54 +37,42 @@ export const WalletEvents = ({ wallet, loading }: WalletEventsProps) => {
     return null;
   }
 
-  // Mock events data - في التطبيق الحقيقي، ستأتي من GraphQL
-  const mockEvents = [
-    {
-      id: "1",
-      type: WalletEventType.CREDITED,
-      user: { id: "1", email: "admin@example.com" },
-      date: "2024-01-15T10:00:00Z",
-      parameters: { amount: "100.00", currency: wallet.currency },
-    },
-    {
-      id: "2",
-      type: WalletEventType.DEBITED,
-      user: null,
-      app: { id: "1", name: "Store Frontend" },
-      date: "2024-01-14T15:30:00Z",
-      parameters: { amount: "50.00", currency: wallet.currency, orderId: "ORD-123" },
-    },
-    {
-      id: "3",
-      type: WalletEventType.TOPUP_APPROVED,
-      user: { id: "2", email: "staff@example.com" },
-      date: "2024-01-13T12:00:00Z",
-      parameters: { amount: "100.00", currency: wallet.currency, requestId: "REQ-456" },
-    },
-  ];
+  const events = wallet.events ?? [];
 
   const getEventTypeLabel = (type: WalletEventType) => {
     switch (type) {
       case WalletEventType.CREDITED:
-        return intl.formatMessage({ id: "wallet.event.credited", defaultMessage: "Credited" });
+        return intl.formatMessage({ id: "ChZ06t", defaultMessage: "Credited" });
       case WalletEventType.DEBITED:
-        return intl.formatMessage({ id: "wallet.event.debited", defaultMessage: "Debited" });
+        return intl.formatMessage({ id: "VmjvtO", defaultMessage: "Debited" });
       case WalletEventType.RESERVED:
-        return intl.formatMessage({ id: "wallet.event.reserved", defaultMessage: "Reserved" });
+        return intl.formatMessage({ id: "sI/NFi", defaultMessage: "Reserved" });
       case WalletEventType.RESERVATION_RELEASED:
-        return intl.formatMessage({ id: "wallet.event.released", defaultMessage: "Released" });
+        return intl.formatMessage({ id: "GnNfTd", defaultMessage: "Released" });
       case WalletEventType.REFUNDED:
-        return intl.formatMessage({ id: "wallet.event.refunded", defaultMessage: "Refunded" });
+        return intl.formatMessage({ id: "Gs86nL", defaultMessage: "Refunded" });
       case WalletEventType.TOPUP_REQUESTED:
-        return intl.formatMessage({ id: "wallet.event.topupRequested", defaultMessage: "Top-up Requested" });
+        return intl.formatMessage({
+          id: "6G6fGJ",
+          defaultMessage: "Top-up Requested",
+        });
       case WalletEventType.TOPUP_APPROVED:
-        return intl.formatMessage({ id: "wallet.event.topupApproved", defaultMessage: "Top-up Approved" });
+        return intl.formatMessage({
+          id: "YfTem1",
+          defaultMessage: "Top-up Approved",
+        });
       case WalletEventType.TOPUP_REJECTED:
-        return intl.formatMessage({ id: "wallet.event.topupRejected", defaultMessage: "Top-up Rejected" });
+        return intl.formatMessage({
+          id: "y9+LhI",
+          defaultMessage: "Top-up Rejected",
+        });
       case WalletEventType.MANUAL_ADJUSTMENT:
-        return intl.formatMessage({ id: "wallet.event.manualAdjustment", defaultMessage: "Manual Adjustment" });
+        return intl.formatMessage({
+          id: "IZeuSS",
+          defaultMessage: "Manual Adjustment",
+        });
       case WalletEventType.NOTE_ADDED:
-        return intl.formatMessage({ id: "wallet.event.noteAdded", defaultMessage: "Note Added" });
+        return intl.formatMessage({ id: "vqBEFb", defaultMessage: "Note Added" });
       default:
         return type;
     }
@@ -113,17 +101,17 @@ export const WalletEvents = ({ wallet, loading }: WalletEventsProps) => {
       <DashboardCard.Header>
         <DashboardCard.Title>
           {intl.formatMessage({
-            id: "wallet.events.title",
+            id: "nc8QpJ",
             defaultMessage: "Recent Activity",
           })}
         </DashboardCard.Title>
       </DashboardCard.Header>
       <DashboardCard.Content>
-        {mockEvents.length === 0 ? (
+        {events.length === 0 ? (
           <Box padding={4} textAlign="center">
             <Text color="default2">
               {intl.formatMessage({
-                id: "wallet.events.empty",
+                id: "dp2TEO",
                 defaultMessage: "No activity found",
               })}
             </Text>
@@ -134,32 +122,32 @@ export const WalletEvents = ({ wallet, loading }: WalletEventsProps) => {
               <TableRowLink>
                 <TableCell>
                   {intl.formatMessage({
-                    id: "wallet.events.type",
+                    id: "m1czzY",
                     defaultMessage: "Event",
                   })}
                 </TableCell>
                 <TableCell>
                   {intl.formatMessage({
-                    id: "wallet.events.actor",
+                    id: "CHXoWz",
                     defaultMessage: "Actor",
                   })}
                 </TableCell>
                 <TableCell>
                   {intl.formatMessage({
-                    id: "wallet.events.details",
+                    id: "Lv0zJu",
                     defaultMessage: "Details",
                   })}
                 </TableCell>
                 <TableCell>
                   {intl.formatMessage({
-                    id: "wallet.events.date",
+                    id: "P7PLVj",
                     defaultMessage: "Date",
                   })}
                 </TableCell>
               </TableRowLink>
             </TableHead>
             <TableBody>
-              {mockEvents.map(event => (
+              {events.map(event => (
                 <TableRowLink key={event.id}>
                   <TableCell>
                     <Text color={getEventTypeColor(event.type)}>
@@ -194,9 +182,7 @@ export const WalletEvents = ({ wallet, loading }: WalletEventsProps) => {
                       )}
                     </Box>
                   </TableCell>
-                  <TableCell>
-                    {new Date(event.date).toLocaleString()}
-                  </TableCell>
+                  <TableCell>{new Date(event.date).toLocaleString()}</TableCell>
                 </TableRowLink>
               ))}
             </TableBody>

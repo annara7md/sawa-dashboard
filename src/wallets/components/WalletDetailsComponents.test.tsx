@@ -10,12 +10,30 @@ const boxProps: Array<Record<string, unknown>> = [];
 const textProps: Array<Record<string, unknown>> = [];
 
 jest.mock("@dashboard/components/Card", () => {
-  const DashboardCard = ({ children }: { children: React.ReactNode }) => <section>{children}</section>;
+  const DashboardCard = function DashboardCard({ children }: { children: React.ReactNode }) {
+    return <section>{children}</section>;
+  };
 
-  DashboardCard.Header = ({ children }: { children: React.ReactNode }) => <div>{children}</div>;
-  DashboardCard.Title = ({ children }: { children: React.ReactNode }) => <div>{children}</div>;
-  DashboardCard.Toolbar = ({ children }: { children: React.ReactNode }) => <div>{children}</div>;
-  DashboardCard.Content = ({ children }: { children: React.ReactNode }) => <div>{children}</div>;
+  DashboardCard.Header = function DashboardCardHeader({ children }: { children: React.ReactNode }) {
+    return <div>{children}</div>;
+  };
+  DashboardCard.Title = function DashboardCardTitle({ children }: { children: React.ReactNode }) {
+    return <div>{children}</div>;
+  };
+  DashboardCard.Toolbar = function DashboardCardToolbar({
+    children,
+  }: {
+    children: React.ReactNode;
+  }) {
+    return <div>{children}</div>;
+  };
+  DashboardCard.Content = function DashboardCardContent({
+    children,
+  }: {
+    children: React.ReactNode;
+  }) {
+    return <div>{children}</div>;
+  };
 
   return { DashboardCard };
 });
@@ -62,6 +80,27 @@ const wallet = {
   isActive: true,
   createdAt: "2026-03-16T00:00:00Z",
   updatedAt: "2026-03-16T00:00:00Z",
+  entries: [
+    {
+      id: "entry-1",
+      entryType: "credit",
+      amount: { amount: 100, currency: "SDG" },
+      balanceAfter: { amount: 100, currency: "SDG" },
+      reservedAfter: { amount: 0, currency: "SDG" },
+      reason: "Initial credit",
+      note: "",
+      createdAt: "2026-03-16T00:00:00Z",
+    },
+  ],
+  events: [
+    {
+      id: "event-1",
+      type: "CREDITED",
+      user: { id: "user-1", email: "user@example.com" },
+      parameters: { amount: "100.00", currency: "SDG" },
+      date: "2026-03-16T00:00:00Z",
+    },
+  ],
 };
 
 describe("Wallet details components", () => {
@@ -75,12 +114,7 @@ describe("Wallet details components", () => {
       <IntlProvider locale="en" messages={{}}>
         <WalletStats wallet={wallet} loading={false} />
         <WalletInfo wallet={wallet} loading={false} />
-        <WalletEntries
-          wallet={wallet}
-          loading={false}
-          onManualAdjustment={jest.fn()}
-          onRefund={jest.fn()}
-        />
+        <WalletEntries wallet={wallet} loading={false} />
         <WalletEvents wallet={wallet} loading={false} />
       </IntlProvider>,
     );

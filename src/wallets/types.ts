@@ -24,6 +24,8 @@ export interface Wallet {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
+  entries?: WalletEntry[];
+  events?: WalletEvent[];
 }
 
 export interface WalletEntry {

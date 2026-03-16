@@ -13,21 +13,24 @@ import { useIntl } from "react-intl";
 
 import { type Wallet } from "../../types";
 import { type WalletListUrlSortField } from "../../urls";
+import { WalletActionGroup } from "../WalletActionGroup";
 import { WalletListDatagrid } from "../WalletListDatagrid/WalletListDatagrid";
-import {
-  createFilterStructure,
-  type WalletFilterKeys,
-  type WalletListFilterOpts,
-} from "./filters";
+import { createFilterStructure, type WalletFilterKeys, type WalletListFilterOpts } from "./filters";
 
 interface WalletListPageProps
   extends PageListProps,
     FilterPagePropsWithPresets<WalletFilterKeys, WalletListFilterOpts>,
     SortPage<WalletListUrlSortField> {
   wallets: Wallet[] | undefined;
+  selectedWallet?: Wallet;
   selectedWalletIds: string[];
   loading: boolean;
   onSelectWalletIds: (rows: number[], clearSelection: () => void) => void;
+  onAddCredit: () => void;
+  onManualAdjustment: () => void;
+  onRefund: () => void;
+  onToggleActive: () => void;
+  walletActionLoading: boolean;
 }
 
 const WalletListPage = ({
@@ -41,10 +44,16 @@ const WalletListPage = ({
   onFilterPresetPresetSave,
   filterPresets,
   filterOpts,
+  selectedWallet,
   selectedWalletIds,
   onSelectWalletIds,
   hasPresetsChanged,
   onFilterChange,
+  onAddCredit,
+  onManualAdjustment,
+  onRefund,
+  onToggleActive,
+  walletActionLoading,
   ...walletListProps
 }: WalletListPageProps) => {
   const intl = useIntl();
@@ -53,11 +62,7 @@ const WalletListPage = ({
 
   return (
     <>
-      <TopNav
-        title={intl.formatMessage(sectionNames.wallets)}
-        withoutBorder
-        isAlignToRight={false}
-      >
+      <TopNav title={intl.formatMessage(sectionNames.wallets)} withoutBorder isAlignToRight={false}>
         <Box __flex={1} display="flex" justifyContent="space-between" alignItems="center">
           <Box display="flex">
             <FilterPresetsSelect
@@ -72,7 +77,7 @@ const WalletListPage = ({
               isOpen={isFilterPresetOpen}
               onOpenChange={setFilterPresetOpen}
               selectAllLabel={intl.formatMessage({
-                id: "wallets.all",
+                id: "IalTWw",
                 defaultMessage: "All wallets",
                 description: "tab name",
               })}
@@ -84,12 +89,22 @@ const WalletListPage = ({
         <ListFilters
           initialSearch={initialSearch}
           searchPlaceholder={intl.formatMessage({
-            id: "wallets.search.placeholder",
+            id: "+ngs2m",
             defaultMessage: "Search wallets...",
           })}
           onSearchChange={onSearchChange}
           filterStructure={filterStructure}
           onFilterChange={onFilterChange}
+          actions={
+            <WalletActionGroup
+              wallet={selectedWalletIds.length === 1 ? selectedWallet : undefined}
+              disabled={walletActionLoading}
+              onAddCredit={onAddCredit}
+              onManualAdjustment={onManualAdjustment}
+              onRefund={onRefund}
+              onToggleActive={onToggleActive}
+            />
+          }
         />
         <WalletListDatagrid
           {...walletListProps}

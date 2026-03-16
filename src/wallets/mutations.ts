@@ -38,8 +38,73 @@ export const walletTopUpRejectMutation = gql`
 
 // Manual wallet adjustment (staff only)
 export const walletManualAdjustmentMutation = gql`
-  mutation WalletManualAdjustment($walletId: ID!, $amount: String!, $reason: String!, $note: String) {
+  mutation WalletManualAdjustment(
+    $walletId: ID!
+    $amount: String!
+    $reason: String!
+    $note: String
+  ) {
     walletManualAdjustment(walletId: $walletId, amount: $amount, reason: $reason, note: $note) {
+      wallet {
+        ...Wallet
+      }
+      walletErrors {
+        field
+        message
+        code
+      }
+    }
+  }
+  ${walletFragment}
+`;
+
+export const walletCreditMutation = gql`
+  mutation WalletCredit($walletId: ID!, $amount: String!, $reason: String!, $note: String) {
+    walletCredit(walletId: $walletId, amount: $amount, reason: $reason, note: $note) {
+      wallet {
+        ...Wallet
+      }
+      walletErrors {
+        field
+        message
+        code
+      }
+    }
+  }
+  ${walletFragment}
+`;
+
+export const walletSetActiveMutation = gql`
+  mutation WalletSetActive($walletId: ID!, $isActive: Boolean!) {
+    walletSetActive(walletId: $walletId, isActive: $isActive) {
+      wallet {
+        ...Wallet
+      }
+      walletErrors {
+        field
+        message
+        code
+      }
+    }
+  }
+  ${walletFragment}
+`;
+
+export const walletRefundForWalletMutation = gql`
+  mutation WalletRefundForWallet(
+    $walletId: ID!
+    $orderNumber: String!
+    $amount: String!
+    $reason: String
+    $note: String
+  ) {
+    walletRefundForWallet(
+      walletId: $walletId
+      orderNumber: $orderNumber
+      amount: $amount
+      reason: $reason
+      note: $note
+    ) {
       wallet {
         ...Wallet
       }

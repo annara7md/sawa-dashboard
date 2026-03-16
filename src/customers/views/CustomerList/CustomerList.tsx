@@ -22,11 +22,13 @@ import createFilterHandlers from "@dashboard/utils/handlers/filterHandlers";
 import createSortHandler from "@dashboard/utils/handlers/sortHandler";
 import { mapEdgesToItems } from "@dashboard/utils/maps";
 import { getSortParams } from "@dashboard/utils/sort";
+import { useWalletActionHandlers } from "@dashboard/wallets/hooks/useWalletActionHandlers";
 import isEqual from "lodash/isEqual";
 import { useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 import CustomerListPage from "../../components/CustomerListPage";
+import { useCustomerWallets } from "../../hooks/useCustomerWallets";
 import {
   customerListUrl,
   type CustomerListUrlDialog,
@@ -89,6 +91,14 @@ const CustomerList = ({ params }: CustomerListProps) => {
     variables: newQueryVariables,
   });
   const customers = mapEdgesToItems(data?.customers);
+  const selectedCustomerId =
+    selectedRowIds.length === 1 && typeof selectedRowIds[0] === "string" ? selectedRowIds[0] : "";
+  const { wallets: selectedCustomerWallets, refetch: refetchSelectedCustomerWallets } =
+    useCustomerWallets({
+      userId: selectedCustomerId,
+    });
+  const selectedCustomerWallet =
+    selectedCustomerWallets.find(wallet => wallet.currency === "USD") ?? selectedCustomerWallets[0];
   const [changeFilters, resetFilters, handleSearchChange] = createFilterHandlers({
     cleanupFn: clearRowSelection,
     createUrl: customerListUrl,
@@ -118,6 +128,16 @@ const CustomerList = ({ params }: CustomerListProps) => {
         closeModal();
       }
     },
+  });
+  const {
+    handleAddCredit,
+    handleManualAdjustment,
+    handleRefund,
+    handleToggleActive,
+    loading: walletActionLoading,
+  } = useWalletActionHandlers({
+    wallet: selectedCustomerWallet,
+    onComplete: refetchSelectedCustomerWallets,
   });
   const handleSort = createSortHandler(navigate, customerListUrl, params);
   const handleSetSelectedCustomerIds = useCallback(
@@ -163,10 +183,16 @@ const CustomerList = ({ params }: CustomerListProps) => {
         onUpdateListSettings={updateListSettings}
         onSort={handleSort}
         selectedCustomerIds={selectedRowIds}
+        selectedCustomerWallet={selectedCustomerWallet}
         onSelectCustomerIds={handleSetSelectedCustomerIds}
         sort={getSortParams(params)}
         hasPresetsChanged={hasPresetsChanged}
         onCustomersDelete={() => openModal("remove", { ids: selectedRowIds })}
+        onAddCredit={handleAddCredit}
+        onManualAdjustment={handleManualAdjustment}
+        onRefund={handleRefund}
+        onToggleActive={handleToggleActive}
+        walletActionLoading={walletActionLoading}
       />
       <ActionDialog
         open={params.action === "remove" && selectedRowIds?.length > 0}

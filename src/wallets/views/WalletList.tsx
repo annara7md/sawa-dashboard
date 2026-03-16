@@ -16,8 +16,9 @@ import { useCallback, useMemo } from "react";
 import { useIntl } from "react-intl";
 
 import WalletListPage from "../components/WalletListPage/WalletListPage";
+import { useWalletActionHandlers } from "../hooks/useWalletActionHandlers";
 import { useWalletList } from "../hooks/useWalletList";
-import { type WalletListUrlQueryParams, walletListUrl } from "../urls";
+import { walletListUrl, type WalletListUrlQueryParams } from "../urls";
 import { getFilterOpts, getFilterQueryParam } from "./WalletList/filters";
 
 interface WalletListProps {
@@ -28,7 +29,7 @@ const WalletList = ({ params }: WalletListProps) => {
   const navigate = useNavigator();
   const intl = useIntl();
   const { updateListSettings, settings } = useListSettings(ListViews.WALLET_LIST);
-  
+
   usePaginationReset(walletListUrl, params, settings.rowNumber);
 
   const {
@@ -39,14 +40,15 @@ const WalletList = ({ params }: WalletListProps) => {
   } = useRowSelection(params);
 
   const paginationState = createPaginationState(settings.rowNumber, params);
-  
+
   const queryVariables = useMemo(
     () => ({
       ...paginationState,
       filter: {
         query: params.query,
         currency: params.currency,
-        isActive: params.isActive === "true" ? true : params.isActive === "false" ? false : undefined,
+        isActive:
+          params.isActive === "true" ? true : params.isActive === "false" ? false : undefined,
       },
       sortBy: {
         field: params.sort || "CREATED_AT",
@@ -57,6 +59,17 @@ const WalletList = ({ params }: WalletListProps) => {
   );
 
   const { wallets, loading, pageInfo, refetch } = useWalletList(queryVariables);
+  const selectedWallet = wallets?.find(wallet => wallet.id === selectedRowIds?.[0]);
+  const {
+    handleAddCredit,
+    handleManualAdjustment,
+    handleRefund,
+    handleToggleActive,
+    loading: walletActionLoading,
+  } = useWalletActionHandlers({
+    wallet: selectedWallet,
+    onComplete: refetch,
+  });
 
   const [changeFilters, resetFilters, handleSearchChange] = createFilterHandlers({
     cleanupFn: clearRowSelection,
@@ -74,14 +87,16 @@ const WalletList = ({ params }: WalletListProps) => {
   });
 
   const handleSort = createSortHandler(navigate, walletListUrl, params);
-  
+
   const handleSetSelectedWalletIds = useCallback(
     (rows: number[], clearSelection: () => void) => {
       if (!wallets || wallets.length === 0) {
         return;
       }
 
-      const rowsIds = rows.map(row => wallets[row]?.id).filter((id): id is string => id !== undefined);
+      const rowsIds = rows
+        .map(row => wallets[row]?.id)
+        .filter((id): id is string => id !== undefined);
       const haveSameValues = JSON.stringify(rowsIds) === JSON.stringify(selectedRowIds);
 
       if (!haveSameValues) {
@@ -115,8 +130,14 @@ const WalletList = ({ params }: WalletListProps) => {
         loading={loading}
         onUpdateListSettings={updateListSettings}
         onSort={handleSort}
+        selectedWallet={selectedWallet}
         selectedWalletIds={selectedRowIds || []}
         onSelectWalletIds={handleSetSelectedWalletIds}
+        onAddCredit={handleAddCredit}
+        onManualAdjustment={handleManualAdjustment}
+        onRefund={handleRefund}
+        onToggleActive={handleToggleActive}
+        walletActionLoading={walletActionLoading}
         sort={getSortParams(params)}
       />
     </PaginatorContext.Provider>

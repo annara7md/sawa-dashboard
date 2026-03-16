@@ -16,19 +16,21 @@ jest.mock("@dashboard/components/AppLayout/TopNav", () => ({
 
 jest.mock("@dashboard/components/Layouts", () => {
   const Content = ({ children }: { children: React.ReactNode }) => <div>{children}</div>;
+  const RightSidebar = ({ children }: { children: React.ReactNode }) => <div>{children}</div>;
   const DetailPageLayout = ({ children }: { children: React.ReactNode }) => <div>{children}</div>;
 
   DetailPageLayout.Content = Content;
+  DetailPageLayout.RightSidebar = RightSidebar;
 
   return { DetailPageLayout };
 });
 
-jest.mock("@dashboard/components/Metadata", () => ({
-  Metadata: () => <div />,
+jest.mock("@dashboard/components/Backlink", () => ({
+  Backlink: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
-jest.mock("@dashboard/components/Savebar", () => ({
-  Savebar: () => <div />,
+jest.mock("@dashboard/components/Metadata", () => ({
+  Metadata: () => <div />,
 }));
 
 jest.mock("../WalletInfo/WalletInfo", () => ({
@@ -45,6 +47,10 @@ jest.mock("../WalletEntries/WalletEntries", () => ({
 
 jest.mock("../WalletEvents/WalletEvents", () => ({
   WalletEvents: () => <div />,
+}));
+
+jest.mock("../WalletActionGroup", () => ({
+  WalletActionGroup: () => <div />,
 }));
 
 jest.mock("@saleor/macaw-ui-next", () => ({
@@ -83,23 +89,19 @@ describe("WalletDetailsPage", () => {
             updatedAt: "2026-03-16T00:00:00Z",
           }}
           loading={false}
-          saveButtonBarState="default"
           backHref="/wallets/"
-          onBack={jest.fn()}
-          onSubmit={jest.fn()}
+          onAddCredit={jest.fn()}
           onManualAdjustment={jest.fn()}
           onRefund={jest.fn()}
+          onToggleActive={jest.fn()}
+          actionLoading={false}
         />
       </IntlProvider>,
     );
 
     expect(topNavProps[0]).not.toHaveProperty("onBack");
     expect(topNavProps[0]).toHaveProperty("href");
-    expect(
-      boxProps.some(
-        props => props.gridTemplateColumns === "2fr 1fr" || props.gridTemplateColumns !== undefined,
-      ),
-    ).toBe(false);
-    expect(boxProps.some(props => props.__gridTemplateColumns === "2fr 1fr")).toBe(true);
+    expect(boxProps.some(props => props.gridTemplateColumns !== undefined)).toBe(false);
+    expect(boxProps.some(props => props.paddingTop === 6)).toBe(true);
   });
 });

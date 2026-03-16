@@ -1,38 +1,38 @@
 import { TopNav } from "@dashboard/components/AppLayout/TopNav";
+import { Backlink } from "@dashboard/components/Backlink";
 import { DetailPageLayout } from "@dashboard/components/Layouts";
 import { Metadata } from "@dashboard/components/Metadata";
-import { Savebar } from "@dashboard/components/Savebar";
 import { sectionNames } from "@dashboard/intl";
-import { type ConfirmButtonTransitionState } from "@saleor/macaw-ui-next";
 import { Box, Text } from "@saleor/macaw-ui-next";
 import { useIntl } from "react-intl";
 
 import { type Wallet } from "../../types";
-import { WalletInfo } from "../WalletInfo/WalletInfo";
-import { WalletStats } from "../WalletStats/WalletStats";
+import { WalletActionGroup } from "../WalletActionGroup";
 import { WalletEntries } from "../WalletEntries/WalletEntries";
 import { WalletEvents } from "../WalletEvents/WalletEvents";
+import { WalletInfo } from "../WalletInfo/WalletInfo";
+import { WalletStats } from "../WalletStats/WalletStats";
 
 interface WalletDetailsPageProps {
   wallet: Wallet | undefined;
   loading: boolean;
-  saveButtonBarState: ConfirmButtonTransitionState;
   backHref: string;
-  onBack: () => void;
-  onSubmit: () => void;
+  onAddCredit: () => void;
   onManualAdjustment: () => void;
   onRefund: () => void;
+  onToggleActive: () => void;
+  actionLoading: boolean;
 }
 
 export const WalletDetailsPage = ({
   wallet,
   loading,
-  saveButtonBarState,
   backHref,
-  onBack,
-  onSubmit,
+  onAddCredit,
   onManualAdjustment,
   onRefund,
+  onToggleActive,
+  actionLoading,
 }: WalletDetailsPageProps) => {
   const intl = useIntl();
 
@@ -41,7 +41,7 @@ export const WalletDetailsPage = ({
       <Box padding={4}>
         <Text size={5} fontWeight="bold">
           {intl.formatMessage({
-            id: "wallet.notFound",
+            id: "s9kCG7",
             defaultMessage: "Wallet not found",
           })}
         </Text>
@@ -57,58 +57,38 @@ export const WalletDetailsPage = ({
           wallet
             ? `${wallet.user.firstName} ${wallet.user.lastName} - ${wallet.currency} Wallet`
             : intl.formatMessage({
-                id: "wallet.details.title",
+                id: "WvEoWE",
                 defaultMessage: "Wallet Details",
               })
         }
-      />
-      
+      >
+        <WalletActionGroup
+          wallet={wallet}
+          disabled={loading || actionLoading}
+          onAddCredit={onAddCredit}
+          onManualAdjustment={onManualAdjustment}
+          onRefund={onRefund}
+          onToggleActive={onToggleActive}
+        />
+      </TopNav>
       <DetailPageLayout.Content>
-        <Box display="grid" __gridTemplateColumns="2fr 1fr" gap={6}>
-          <Box display="flex" flexDirection="column" gap={6}>
-            {/* Wallet Statistics */}
-            <WalletStats wallet={wallet} loading={loading} />
-            
-            {/* Recent Entries */}
-            <WalletEntries 
-              wallet={wallet} 
-              loading={loading}
-              onManualAdjustment={onManualAdjustment}
-              onRefund={onRefund}
-            />
-            
-            {/* Recent Events */}
-            <WalletEvents wallet={wallet} loading={loading} />
-          </Box>
-          
-          <Box display="flex" flexDirection="column" gap={6}>
-            {/* Wallet Information */}
-            <WalletInfo wallet={wallet} loading={loading} />
-            
-            {/* Metadata */}
-            {wallet && (
-              <Metadata data={wallet} />
-            )}
-          </Box>
+        <Backlink href={backHref}>{intl.formatMessage(sectionNames.wallets)}</Backlink>
+        <WalletStats wallet={wallet} loading={loading} />
+        <Box paddingTop={6}>
+          <WalletEntries wallet={wallet} loading={loading} />
+        </Box>
+        <Box paddingTop={6}>
+          <WalletEvents wallet={wallet} loading={loading} />
         </Box>
       </DetailPageLayout.Content>
-      
-      <Savebar
-        state={saveButtonBarState}
-        disabled={loading}
-        onCancel={onBack}
-        onSubmit={onSubmit}
-        labels={{
-          confirm: intl.formatMessage({
-            id: "wallet.save",
-            defaultMessage: "Save wallet",
-          }),
-          delete: intl.formatMessage({
-            id: "wallet.delete",
-            defaultMessage: "Delete wallet",
-          }),
-        }}
-      />
+      <DetailPageLayout.RightSidebar>
+        <WalletInfo wallet={wallet} loading={loading} />
+        {wallet && (
+          <Box paddingTop={6}>
+            <Metadata data={wallet} />
+          </Box>
+        )}
+      </DetailPageLayout.RightSidebar>
     </DetailPageLayout>
   );
 };

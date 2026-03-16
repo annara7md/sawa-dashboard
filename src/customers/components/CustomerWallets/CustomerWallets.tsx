@@ -1,10 +1,13 @@
 import { DashboardCard } from "@dashboard/components/Card";
+import { type CustomerDetailsQuery } from "@dashboard/graphql";
 import useNavigator from "@dashboard/hooks/useNavigator";
+import { WalletActionGroup } from "@dashboard/wallets/components/WalletActionGroup";
+import { useWalletActionHandlers } from "@dashboard/wallets/hooks/useWalletActionHandlers";
+import { type Wallet } from "@dashboard/wallets/types";
 import { walletUrl } from "@dashboard/wallets/urls";
 import { Box, Button, Skeleton, Text } from "@saleor/macaw-ui-next";
 import { useIntl } from "react-intl";
 
-import { type CustomerDetailsQuery } from "@dashboard/graphql";
 import { useCustomerWallets } from "../../hooks/useCustomerWallets";
 
 interface CustomerWalletsProps {
@@ -12,13 +15,72 @@ interface CustomerWalletsProps {
   loading?: boolean;
 }
 
+interface CustomerWalletRowProps {
+  wallet: Wallet;
+  onViewWallet: (walletId: string) => void;
+  onComplete: () => void | Promise<void>;
+}
+
+const CustomerWalletRow = ({ wallet, onViewWallet, onComplete }: CustomerWalletRowProps) => {
+  const { handleAddCredit, handleManualAdjustment, handleRefund, handleToggleActive, loading } =
+    useWalletActionHandlers({
+      wallet,
+      onComplete,
+    });
+
+  return (
+    <Box
+      padding={3}
+      marginBottom={2}
+      borderRadius={2}
+      backgroundColor="default1"
+      display="flex"
+      justifyContent="space-between"
+      alignItems="flex-start"
+      gap={3}
+    >
+      <Box>
+        <Text size={4}>
+          {wallet.currency}: {wallet.currentBalance.amount.toFixed(2)}{" "}
+          {wallet.currentBalance.currency}
+        </Text>
+        <Text size={2}>
+          Spendable: {wallet.spendableBalance.amount.toFixed(2)} {wallet.spendableBalance.currency}
+        </Text>
+        {wallet.reservedBalance.amount > 0 && (
+          <Text size={2}>
+            Reserved: {wallet.reservedBalance.amount.toFixed(2)} {wallet.reservedBalance.currency}
+          </Text>
+        )}
+      </Box>
+      <Box display="flex" flexDirection="column" alignItems="flex-end" gap={2}>
+        <Text size={2}>{wallet.isActive ? "Active" : "Inactive"}</Text>
+        <WalletActionGroup
+          wallet={wallet}
+          disabled={loading}
+          onAddCredit={handleAddCredit}
+          onManualAdjustment={handleManualAdjustment}
+          onRefund={handleRefund}
+          onToggleActive={handleToggleActive}
+        />
+        <Button variant="secondary" size="small" onClick={() => onViewWallet(wallet.id)}>
+          View Details
+        </Button>
+      </Box>
+    </Box>
+  );
+};
+
 export const CustomerWallets = ({ customer, loading: customerLoading }: CustomerWalletsProps) => {
   const intl = useIntl();
   const navigate = useNavigator();
 
-  const { wallets, loading: walletsLoading } = useCustomerWallets({
+  const {
+    wallets,
+    loading: walletsLoading,
+    refetch,
+  } = useCustomerWallets({
     userId: customer?.id || "",
-    currencies: ["USD", "SAR", "EUR"],
   });
 
   const loading = customerLoading || walletsLoading;
@@ -50,17 +112,10 @@ export const CustomerWallets = ({ customer, loading: customerLoading }: Customer
     navigate(walletUrl(walletId));
   };
 
-  const handleTopUpRequest = () => {
-    console.log("Top-up request dialog for customer:", customer.id);
-  };
-
-  const handleManualAdjustment = () => {
-    console.log("Manual adjustment dialog for customer:", customer.id);
-  };
-
-  const totalBalance = wallets.reduce((sum: number, wallet: any) => {
+  const totalBalance = wallets.reduce((sum, wallet) => {
     const rate = wallet.currency === "SAR" ? 0.27 : wallet.currency === "EUR" ? 1.1 : 1;
-    return sum + (wallet.currentBalance.amount * rate);
+
+    return sum + wallet.currentBalance.amount * rate;
   }, 0);
 
   return (
@@ -68,102 +123,47 @@ export const CustomerWallets = ({ customer, loading: customerLoading }: Customer
       <DashboardCard.Header>
         <DashboardCard.Title>
           {intl.formatMessage({
-            id: "customer.wallets.title",
+            id: "bUuTZl",
             defaultMessage: "Customer Wallets",
           })}
         </DashboardCard.Title>
       </DashboardCard.Header>
       <DashboardCard.Content>
-        <Box display="flex" justifyContent="space-between" alignItems="center" marginBottom={4}>
+        <Box marginBottom={4}>
           <Text>
             {intl.formatMessage({
-              id: "customer.wallets.description",
+              id: "lWxUhg",
               defaultMessage: "Manage customer wallet balances and transactions",
             })}
           </Text>
-          <Box display="flex" gap={2}>
-            <Button variant="secondary" size="small" onClick={handleTopUpRequest}>
-              {intl.formatMessage({
-                id: "customer.wallets.topUp",
-                defaultMessage: "Top Up",
-              })}
-            </Button>
-            <Button variant="secondary" size="small" onClick={handleManualAdjustment}>
-              {intl.formatMessage({
-                id: "customer.wallets.adjust",
-                defaultMessage: "Adjust",
-              })}
-            </Button>
-          </Box>
         </Box>
 
         {wallets.length === 0 ? (
           <Box padding={4} __textAlign="center">
             <Text>
               {intl.formatMessage({
-                id: "customer.wallets.empty",
+                id: "EvIXzC",
                 defaultMessage: "No wallets found for this customer",
               })}
             </Text>
-            <Box marginTop={2}>
-              <Button variant="primary" size="small" onClick={handleTopUpRequest}>
-                {intl.formatMessage({
-                  id: "customer.wallets.createFirst",
-                  defaultMessage: "Create First Wallet",
-                })}
-              </Button>
-            </Box>
           </Box>
         ) : (
           <Box>
-            {wallets.map((wallet) => (
-              <Box 
-                key={wallet.id} 
-                padding={3} 
-                marginBottom={2} 
-                borderRadius={2} 
-                backgroundColor="default1"
-                display="flex" 
-                justifyContent="space-between" 
-                alignItems="center"
-              >
-                <Box>
-                  <Text size={4}>
-                    {wallet.currency}: {wallet.currentBalance.amount.toFixed(2)} {wallet.currentBalance.currency}
-                  </Text>
-                  <Text size={2}>
-                    Spendable: {wallet.spendableBalance.amount.toFixed(2)} {wallet.spendableBalance.currency}
-                  </Text>
-                  {wallet.reservedBalance.amount > 0 && (
-                    <Text size={2}>
-                      Reserved: {wallet.reservedBalance.amount.toFixed(2)} {wallet.reservedBalance.currency}
-                    </Text>
-                  )}
-                </Box>
-                <Box display="flex" alignItems="center" gap={2}>
-                  <Text size={2}>
-                    {wallet.isActive ? "Active" : "Inactive"}
-                  </Text>
-                  <Button 
-                    variant="secondary" 
-                    size="small"
-                    onClick={() => handleViewWallet(wallet.id)}
-                  >
-                    {intl.formatMessage({
-                      id: "customer.wallets.view",
-                      defaultMessage: "View Details",
-                    })}
-                  </Button>
-                </Box>
-              </Box>
+            {wallets.map(wallet => (
+              <CustomerWalletRow
+                key={wallet.id}
+                wallet={wallet}
+                onViewWallet={handleViewWallet}
+                onComplete={refetch}
+              />
             ))}
-            
+
             {/* Summary */}
             <Box marginTop={4} padding={3} borderRadius={2} backgroundColor="default1">
               <Box display="flex" justifyContent="space-between" alignItems="center">
                 <Text>
                   {intl.formatMessage({
-                    id: "customer.wallets.totalWallets",
+                    id: "vyZGQ8",
                     defaultMessage: "Total Wallets",
                   })}
                 </Text>
@@ -172,7 +172,7 @@ export const CustomerWallets = ({ customer, loading: customerLoading }: Customer
               <Box display="flex" justifyContent="space-between" alignItems="center" marginTop={1}>
                 <Text>
                   {intl.formatMessage({
-                    id: "customer.wallets.totalValue",
+                    id: "siTdEk",
                     defaultMessage: "Total Value (USD)",
                   })}
                 </Text>

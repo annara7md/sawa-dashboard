@@ -42,8 +42,14 @@ describe("WalletListPage", () => {
           loading={false}
           onUpdateListSettings={jest.fn()}
           onSort={jest.fn()}
+          selectedWallet={undefined}
           selectedWalletIds={[]}
           onSelectWalletIds={jest.fn()}
+          onAddCredit={jest.fn()}
+          onManualAdjustment={jest.fn()}
+          onRefund={jest.fn()}
+          onToggleActive={jest.fn()}
+          walletActionLoading={false}
           sort={{ asc: true, sort: "createdAt" }}
         />
       </IntlProvider>,

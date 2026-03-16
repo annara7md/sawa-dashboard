@@ -23,6 +23,8 @@ import {
   type PageListProps,
   type SortPage,
 } from "@dashboard/types";
+import { WalletActionGroup } from "@dashboard/wallets/components/WalletActionGroup";
+import { type Wallet } from "@dashboard/wallets/types";
 import { Box, Button } from "@saleor/macaw-ui-next";
 import { useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -36,9 +38,15 @@ interface CustomerListPageProps
     SortPage<CustomerListUrlSortField> {
   customers: Customers | undefined;
   selectedCustomerIds: string[];
+  selectedCustomerWallet?: Wallet;
   loading: boolean;
   onSelectCustomerIds: (rows: number[], clearSelection: () => void) => void;
   onCustomersDelete: () => void;
+  onAddCredit: () => void;
+  onManualAdjustment: () => void;
+  onRefund: () => void;
+  onToggleActive: () => void;
+  walletActionLoading: boolean;
 }
 
 const CustomerListPage = ({
@@ -52,8 +60,14 @@ const CustomerListPage = ({
   onFilterPresetPresetSave,
   filterPresets,
   selectedCustomerIds,
+  selectedCustomerWallet,
   hasPresetsChanged,
   onCustomersDelete,
+  onAddCredit,
+  onManualAdjustment,
+  onRefund,
+  onToggleActive,
+  walletActionLoading,
   ...customerListProps
 }: CustomerListPageProps) => {
   const intl = useIntl();
@@ -132,6 +146,16 @@ const CustomerListPage = ({
           onSearchChange={onSearchChange}
           actions={
             <Box display="flex" gap={4}>
+              {selectedCustomerIds.length === 1 && selectedCustomerWallet && (
+                <WalletActionGroup
+                  wallet={selectedCustomerWallet}
+                  disabled={walletActionLoading}
+                  onAddCredit={onAddCredit}
+                  onManualAdjustment={onManualAdjustment}
+                  onRefund={onRefund}
+                  onToggleActive={onToggleActive}
+                />
+              )}
               {selectedCustomerIds.length > 0 && (
                 <BulkDeleteButton onClick={onCustomersDelete}>
                   <FormattedMessage defaultMessage="Delete customers" id="kFsTMN" />
