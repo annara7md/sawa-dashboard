@@ -83,6 +83,84 @@ type Query {
   ): WarehouseCountableConnection @doc(category: "Products")
 
   """
+  Look up a wallet by ID.
+  
+  Requires one of the following permissions: HANDLE_PAYMENTS.
+  """
+  wallet(
+    """ID of the wallet."""
+    id: ID!
+  ): Wallet @doc(category: "Wallet")
+
+  """
+  List of wallets.
+  
+  Requires one of the following permissions: HANDLE_PAYMENTS.
+  """
+  wallets(
+    """Filtering options for wallets."""
+    filter: WalletFilterInput
+
+    """Sort wallets."""
+    sortBy: WalletSortingInput
+
+    """Return the elements in the list that come before the specified cursor."""
+    before: String
+
+    """Return the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Retrieve the first n elements from the list. Note that the system only allows fetching a maximum of 100 objects in a single query.
+    """
+    first: Int
+
+    """
+    Retrieve the last n elements from the list. Note that the system only allows fetching a maximum of 100 objects in a single query.
+    """
+    last: Int
+  ): WalletCountableConnection @doc(category: "Wallet")
+
+  """
+  Look up a wallet top-up request by ID.
+  
+  Requires one of the following permissions: HANDLE_PAYMENTS.
+  """
+  walletTopupRequest(
+    """ID of the top-up request."""
+    id: ID!
+  ): WalletTopUpRequest @doc(category: "Wallet")
+
+  """
+  List of wallet top-up requests.
+  
+  Requires one of the following permissions: HANDLE_PAYMENTS.
+  """
+  walletTopupRequests(
+    """Filtering options for top-up requests."""
+    filter: WalletTopUpRequestFilterInput
+
+    """Sort top-up requests."""
+    sortBy: WalletTopUpRequestSortingInput
+
+    """Return the elements in the list that come before the specified cursor."""
+    before: String
+
+    """Return the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Retrieve the first n elements from the list. Note that the system only allows fetching a maximum of 100 objects in a single query.
+    """
+    first: Int
+
+    """
+    Retrieve the last n elements from the list. Note that the system only allows fetching a maximum of 100 objects in a single query.
+    """
+    last: Int
+  ): WalletTopUpRequestCountableConnection @doc(category: "Wallet")
+
+  """
   Returns a list of all translatable items of a given kind.
   
   Requires one of the following permissions: MANAGE_TRANSLATIONS.
@@ -3421,6 +3499,12 @@ type User implements Node & ObjectWithMetadata @doc(category: "Users") {
     """Slug of a channel for which the data should be returned."""
     channel: String!
   ): [StoredPaymentMethod!]
+
+  """User's wallet for the specified currency."""
+  wallet(
+    """Currency code for the wallet."""
+    currency: String!
+  ): Wallet
 }
 
 """Represents user address data."""
@@ -3769,6 +3853,12 @@ type Checkout implements Node & ObjectWithMetadata @doc(category: "Checkout") {
     """Amount that will be used to fetch stored payment methods."""
     amount: PositiveDecimal
   ): [StoredPaymentMethod!]
+
+  """Amount reserved from user's wallet for this checkout."""
+  walletAmount: Money
+
+  """Wallet reservation ID for this checkout."""
+  walletReservationId: String
 
   """List of problems with the checkout."""
   problems: [CheckoutProblem!]
@@ -14002,6 +14092,276 @@ type PaymentSource @doc(category: "Payments") {
   metadata: [MetadataItem!]!
 }
 
+"""Customer wallet for stored-value account."""
+type Wallet implements Node & ObjectWithMetadata @doc(category: "Wallet") {
+  """ID of the wallet."""
+  id: ID!
+
+  """List of private metadata items. Requires staff permissions to access."""
+  privateMetadata: [MetadataItem!]!
+
+  """
+  A single key from private metadata. Requires staff permissions to access.
+  
+  Tip: Use GraphQL aliases to fetch multiple keys.
+  """
+  privateMetafield(key: String!): String
+
+  """
+  Private metadata. Requires staff permissions to access. Use `keys` to control which fields you want to include. The default is to include everything.
+  """
+  privateMetafields(keys: [String!]): Metadata
+
+  """List of public metadata items. Can be accessed without permissions."""
+  metadata: [MetadataItem!]!
+
+  """
+  A single key from public metadata.
+  
+  Tip: Use GraphQL aliases to fetch multiple keys.
+  """
+  metafield(key: String!): String
+
+  """
+  Public metadata. Use `keys` to control which fields you want to include. The default is to include everything.
+  """
+  metafields(keys: [String!]): Metadata
+
+  """User who owns this wallet."""
+  user: User!
+
+  """Currency code for this wallet."""
+  currency: String!
+
+  """Total current balance."""
+  currentBalance: Money!
+
+  """Amount currently reserved."""
+  reservedBalance: Money!
+
+  """Available balance that can be spent."""
+  spendableBalance: Money!
+
+  """Balance breakdown."""
+  balance: WalletBalanceType!
+
+  """Whether wallet is active."""
+  isActive: Boolean!
+
+  """Date and time when wallet was created."""
+  createdAt: DateTime!
+
+  """Date and time when wallet was last updated."""
+  updatedAt: DateTime!
+
+  """
+  Ledger entries for this wallet.
+  
+  Requires one of the following permissions: HANDLE_PAYMENTS.
+  """
+  entries: [WalletEntry!]!
+
+  """
+  Timeline events for this wallet.
+  
+  Requires one of the following permissions: HANDLE_PAYMENTS.
+  """
+  events: [WalletEvent!]!
+}
+
+"""Wallet balance breakdown."""
+type WalletBalanceType {
+  """Total current balance in wallet."""
+  currentBalance: Money!
+
+  """Amount currently reserved (held during checkout)."""
+  reservedBalance: Money!
+
+  """Available balance that can be spent (current - reserved)."""
+  spendableBalance: Money!
+}
+
+"""Immutable ledger entry for wallet balance changes."""
+type WalletEntry implements Node @doc(category: "Wallet") {
+  """ID of the entry."""
+  id: ID!
+
+  """Wallet this entry belongs to."""
+  wallet: Wallet!
+
+  """Type of entry (credit, debit, reserve, release, refund, adjustment)."""
+  entryType: String!
+
+  """Amount of this entry."""
+  amount: Money!
+
+  """Wallet balance after this entry."""
+  balanceAfter: Money!
+
+  """Reserved balance after this entry."""
+  reservedAfter: Money!
+
+  """User who created this entry."""
+  createdByUser: User
+
+  """App that created this entry."""
+  createdByApp: App
+
+  """Related order if applicable."""
+  order: Order
+
+  """Related checkout if applicable."""
+  checkout: Checkout
+
+  """Related top-up request if applicable."""
+  topupRequest: WalletTopUpRequest
+
+  """Reason for this entry."""
+  reason: String
+
+  """Additional note."""
+  note: String
+
+  """Date and time when entry was created."""
+  createdAt: DateTime!
+}
+
+"""Request to top up wallet balance via bank transfer."""
+type WalletTopUpRequest implements Node & ObjectWithMetadata @doc(category: "Wallet") {
+  """ID of the request."""
+  id: ID!
+
+  """List of private metadata items. Requires staff permissions to access."""
+  privateMetadata: [MetadataItem!]!
+
+  """
+  A single key from private metadata. Requires staff permissions to access.
+  
+  Tip: Use GraphQL aliases to fetch multiple keys.
+  """
+  privateMetafield(key: String!): String
+
+  """
+  Private metadata. Requires staff permissions to access. Use `keys` to control which fields you want to include. The default is to include everything.
+  """
+  privateMetafields(keys: [String!]): Metadata
+
+  """List of public metadata items. Can be accessed without permissions."""
+  metadata: [MetadataItem!]!
+
+  """
+  A single key from public metadata.
+  
+  Tip: Use GraphQL aliases to fetch multiple keys.
+  """
+  metafield(key: String!): String
+
+  """
+  Public metadata. Use `keys` to control which fields you want to include. The default is to include everything.
+  """
+  metafields(keys: [String!]): Metadata
+
+  """Wallet to top up."""
+  wallet: Wallet!
+
+  """Status of the request."""
+  status: WalletTopUpStatusEnum!
+
+  """Amount to top up."""
+  amount: Money!
+
+  """External bank transfer reference number."""
+  bankReference: String
+
+  """Internal transfer reference."""
+  transferReference: String
+
+  """Note from customer about this top-up."""
+  customerNote: String
+
+  """Staff user who reviewed this request."""
+  reviewedBy: User
+
+  """App that reviewed this request."""
+  reviewedByApp: App
+
+  """Date and time when request was reviewed."""
+  reviewedAt: DateTime
+
+  """Internal note from staff reviewer."""
+  staffNote: String
+
+  """Reason for rejection (visible to customer)."""
+  rejectionReason: String
+
+  """Date and time when request was created."""
+  createdAt: DateTime!
+
+  """Date and time when request was last updated."""
+  updatedAt: DateTime!
+
+  """
+  Events related to this top-up request.
+  
+  Requires one of the following permissions: HANDLE_PAYMENTS.
+  """
+  events: [WalletEvent!]!
+}
+
+"""Wallet top-up request status."""
+enum WalletTopUpStatusEnum {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+"""Timeline event for wallet activity."""
+type WalletEvent implements Node @doc(category: "Wallet") {
+  """ID of the event."""
+  id: ID!
+
+  """Date when event happened."""
+  date: DateTime!
+
+  """Wallet event type."""
+  type: WalletEventsEnum!
+
+  """User who performed the action."""
+  user: User
+
+  """App that performed the action."""
+  app: App
+
+  """Wallet this event belongs to."""
+  wallet: Wallet!
+
+  """Related order if applicable."""
+  order: Order
+
+  """Related checkout if applicable."""
+  checkout: Checkout
+
+  """Related top-up request if applicable."""
+  topupRequest: WalletTopUpRequest
+
+  """Event parameters."""
+  parameters: JSONString
+}
+
+"""Wallet event types."""
+enum WalletEventsEnum {
+  CREDITED
+  DEBITED
+  RESERVED
+  RESERVATION_RELEASED
+  REFUNDED
+  TOPUP_REQUESTED
+  TOPUP_APPROVED
+  TOPUP_REJECTED
+  MANUAL_ADJUSTMENT
+  NOTE_ADDED
+}
+
 """Represents the app's brand data."""
 type AppBrand @doc(category: "Apps") {
   """App's logos details."""
@@ -14370,6 +14730,75 @@ input WarehouseSortingInput @doc(category: "Products") {
 enum WarehouseSortField @doc(category: "Products") {
   """Sort warehouses by name."""
   NAME
+}
+
+type WalletCountableConnection @doc(category: "Wallet") {
+  """Pagination data for this connection."""
+  pageInfo: PageInfo!
+  edges: [WalletCountableEdge!]!
+
+  """A total count of items in the collection."""
+  totalCount: Int
+}
+
+type WalletCountableEdge @doc(category: "Wallet") {
+  """The item at the end of the edge."""
+  node: Wallet!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+"""Input for filtering wallets."""
+input WalletFilterInput @doc(category: "Wallet") {
+  """Filter by user ID."""
+  user: [ID!]
+
+  """Filter by currency code."""
+  currency: String
+
+  """Filter by active status."""
+  isActive: Boolean
+  metadata: [MetadataFilter!]
+}
+
+"""Input for sorting wallets."""
+input WalletSortingInput @doc(category: "Wallet") {
+  """Specifies the direction in which to sort."""
+  direction: OrderDirection!
+}
+
+type WalletTopUpRequestCountableConnection @doc(category: "Wallet") {
+  """Pagination data for this connection."""
+  pageInfo: PageInfo!
+  edges: [WalletTopUpRequestCountableEdge!]!
+
+  """A total count of items in the collection."""
+  totalCount: Int
+}
+
+type WalletTopUpRequestCountableEdge @doc(category: "Wallet") {
+  """The item at the end of the edge."""
+  node: WalletTopUpRequest!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+"""Input for filtering wallet top-up requests."""
+input WalletTopUpRequestFilterInput @doc(category: "Wallet") {
+  """Filter by wallet ID."""
+  wallet: [ID!]
+
+  """Filter by status."""
+  status: String
+  metadata: [MetadataFilter!]
+}
+
+"""Input for sorting wallet top-up requests."""
+input WalletTopUpRequestSortingInput @doc(category: "Wallet") {
+  """Specifies the direction in which to sort."""
+  direction: OrderDirection!
 }
 
 type TranslatableItemConnection {
@@ -17584,6 +18013,121 @@ type Mutation {
     """List of shipping zone IDs."""
     shippingZoneIds: [ID!]!
   ): WarehouseShippingZoneUnassign @doc(category: "Products")
+
+  """
+  Create wallet top-up request. 
+  
+  Requires one of the following permissions: AUTHENTICATED_USER.
+  """
+  walletTopupRequestCreate(
+    """Fields required to create a wallet top-up request."""
+    input: WalletTopUpRequestCreateInput!
+  ): WalletTopUpRequestCreate @doc(category: "Wallet")
+
+  """
+  Approve wallet top-up request and credit wallet. 
+  
+  Requires one of the following permissions: HANDLE_PAYMENTS.
+  """
+  walletTopupApprove(
+    """ID of the top-up request to approve."""
+    id: ID!
+
+    """Internal note from staff reviewer."""
+    staffNote: String
+  ): WalletTopUpApprove @doc(category: "Wallet")
+
+  """
+  Reject wallet top-up request. 
+  
+  Requires one of the following permissions: HANDLE_PAYMENTS.
+  """
+  walletTopupReject(
+    """ID of the top-up request to reject."""
+    id: ID!
+
+    """Reason for rejection (visible to customer)."""
+    rejectionReason: String!
+
+    """Internal note from staff reviewer."""
+    staffNote: String
+  ): WalletTopUpReject @doc(category: "Wallet")
+
+  """
+  Create manual wallet balance adjustment. Staff only. 
+  
+  Requires one of the following permissions: HANDLE_PAYMENTS.
+  """
+  walletManualAdjustment(
+    """Amount to adjust (positive = credit, negative = debit)."""
+    amount: String!
+
+    """Additional note."""
+    note: String
+
+    """Reason for adjustment (required)."""
+    reason: String!
+
+    """ID of the wallet to adjust."""
+    walletId: ID!
+  ): WalletManualAdjustment @doc(category: "Wallet")
+
+  """
+  Refund amount back to wallet. 
+  
+  Requires one of the following permissions: HANDLE_PAYMENTS.
+  """
+  walletRefund(
+    """Amount to refund."""
+    amount: String!
+
+    """ID of the order to refund from."""
+    orderId: ID!
+
+    """Reason for refund."""
+    reason: String
+  ): WalletRefund @doc(category: "Wallet")
+
+  """
+  Apply wallet balance to checkout.
+  
+  Added in Saleor 3.20.
+  """
+  walletApplyToCheckout(
+    """Amount to reserve from wallet."""
+    amount: String!
+
+    """ID of the checkout to apply wallet to."""
+    checkoutId: ID!
+  ): WalletApplyToCheckout @doc(category: "Wallet")
+
+  """
+  Remove wallet balance from checkout.
+  
+  Added in Saleor 3.20.
+  """
+  walletRemoveFromCheckout(
+    """ID of the checkout to remove wallet from."""
+    checkoutId: ID!
+  ): WalletRemoveFromCheckout @doc(category: "Wallet")
+
+  """
+  Refund order amount to customer's wallet.
+  
+  Added in Saleor 3.20. 
+  
+  Requires one of the following permissions: HANDLE_PAYMENTS.
+  """
+  walletOrderRefund(
+    """Amount to refund to wallet."""
+    amount: String!
+
+    """ID of the order to refund."""
+    orderId: ID!
+
+    """Reason for the refund."""
+    reason: String = "Order refund"
+  ): WalletOrderRefund @doc(category: "Wallet")
 
   """
   Creates a tax class. 
@@ -22527,6 +23071,165 @@ type WarehouseShippingZoneUnassign @doc(category: "Products") {
   warehouseErrors: [WarehouseError!]! @deprecated(reason: "Use `errors` field instead.")
   errors: [WarehouseError!]!
   warehouse: Warehouse
+}
+
+"""
+Create wallet top-up request. 
+
+Requires one of the following permissions: AUTHENTICATED_USER.
+"""
+type WalletTopUpRequestCreate @doc(category: "Wallet") {
+  """Created top-up request."""
+  topupRequest: WalletTopUpRequest
+  walletErrors: [WalletError!]! @deprecated(reason: "Use `errors` field instead.")
+  errors: [WalletError!]!
+}
+
+"""Wallet error type."""
+type WalletError {
+  """
+  Name of a field that caused the error. A value of `null` indicates that the error isn't associated with a particular field.
+  """
+  field: String
+
+  """The error message."""
+  message: String
+
+  """The error code."""
+  code: WalletErrorCode!
+}
+
+"""Wallet error codes."""
+enum WalletErrorCode {
+  GRAPHQL_ERROR
+  INVALID
+  NOT_FOUND
+  REQUIRED
+  WALLET_NOT_FOUND
+  WALLET_INACTIVE
+  CURRENCY_MISMATCH
+  INSUFFICIENT_BALANCE
+  INSUFFICIENT_SPENDABLE_BALANCE
+  NEGATIVE_BALANCE_NOT_ALLOWED
+  INVALID_AMOUNT
+  TOPUP_NOT_FOUND
+  TOPUP_ALREADY_PROCESSED
+  TOPUP_INVALID_STATUS_TRANSITION
+  TOPUP_CANNOT_BE_APPROVED
+  TOPUP_CANNOT_BE_REJECTED
+  RESERVATION_NOT_FOUND
+  RESERVATION_ALREADY_EXISTS
+  RESERVATION_INVALID_STATE
+  ORDER_NOT_FOUND
+  CHECKOUT_NOT_FOUND
+  INVALID_ORDER_STATE
+  INVALID_CHECKOUT_STATE
+  PERMISSION_DENIED
+  DUPLICATE_OPERATION
+  IDEMPOTENCY_KEY_MISMATCH
+  REFUND_NOT_ALLOWED
+  REFUND_AMOUNT_EXCEEDS_PAYMENT
+}
+
+"""Input for creating wallet top-up request."""
+input WalletTopUpRequestCreateInput @doc(category: "Wallet") {
+  """Currency code for the wallet."""
+  currency: String!
+
+  """Amount to top up."""
+  amount: String!
+
+  """External bank transfer reference number."""
+  bankReference: String
+
+  """Note from customer about this top-up."""
+  customerNote: String
+}
+
+"""
+Approve wallet top-up request and credit wallet. 
+
+Requires one of the following permissions: HANDLE_PAYMENTS.
+"""
+type WalletTopUpApprove @doc(category: "Wallet") {
+  """Approved top-up request."""
+  topupRequest: WalletTopUpRequest
+  walletErrors: [WalletError!]! @deprecated(reason: "Use `errors` field instead.")
+  errors: [WalletError!]!
+}
+
+"""
+Reject wallet top-up request. 
+
+Requires one of the following permissions: HANDLE_PAYMENTS.
+"""
+type WalletTopUpReject @doc(category: "Wallet") {
+  """Rejected top-up request."""
+  topupRequest: WalletTopUpRequest
+  walletErrors: [WalletError!]! @deprecated(reason: "Use `errors` field instead.")
+  errors: [WalletError!]!
+}
+
+"""
+Create manual wallet balance adjustment. Staff only. 
+
+Requires one of the following permissions: HANDLE_PAYMENTS.
+"""
+type WalletManualAdjustment @doc(category: "Wallet") {
+  """Updated wallet."""
+  wallet: Wallet
+  walletErrors: [WalletError!]! @deprecated(reason: "Use `errors` field instead.")
+  errors: [WalletError!]!
+}
+
+"""
+Refund amount back to wallet. 
+
+Requires one of the following permissions: HANDLE_PAYMENTS.
+"""
+type WalletRefund @doc(category: "Wallet") {
+  """Updated wallet."""
+  wallet: Wallet
+  walletErrors: [WalletError!]! @deprecated(reason: "Use `errors` field instead.")
+  errors: [WalletError!]!
+}
+
+"""
+Apply wallet balance to checkout.
+
+Added in Saleor 3.20.
+"""
+type WalletApplyToCheckout @doc(category: "Wallet") {
+  """Updated checkout."""
+  checkout: Checkout
+  walletErrors: [WalletError!]! @deprecated(reason: "Use `errors` field instead.")
+  errors: [WalletError!]!
+}
+
+"""
+Remove wallet balance from checkout.
+
+Added in Saleor 3.20.
+"""
+type WalletRemoveFromCheckout @doc(category: "Wallet") {
+  """Updated checkout."""
+  checkout: Checkout
+  walletErrors: [WalletError!]! @deprecated(reason: "Use `errors` field instead.")
+  errors: [WalletError!]!
+}
+
+"""
+Refund order amount to customer's wallet.
+
+Added in Saleor 3.20. 
+
+Requires one of the following permissions: HANDLE_PAYMENTS.
+"""
+type WalletOrderRefund @doc(category: "Wallet") {
+  """Updated order."""
+  order: Order
+  walletErrors: [WalletError!]! @deprecated(reason: "Use `errors` field instead.")
+  errors: [WalletError!]!
 }
 
 """

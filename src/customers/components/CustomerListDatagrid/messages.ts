@@ -23,4 +23,9 @@ export const columnsMessages = defineMessages({
     defaultMessage: "No. of orders",
     description: "column header",
   },
+  walletBalance: {
+    id: "customer.walletBalance",
+    defaultMessage: "Wallet Balance",
+    description: "column header",
+  },
 });

@@ -5,7 +5,7 @@ import { walletFragment, walletTopUpRequestFragment } from "./fragments";
 // Approve top-up request
 export const walletTopUpApproveMutation = gql`
   mutation WalletTopUpApprove($id: ID!, $staffNote: String) {
-    walletTopUpApprove(id: $id, staffNote: $staffNote) {
+    walletTopupApprove(id: $id, staffNote: $staffNote) {
       topupRequest {
         ...WalletTopUpRequest
       }
@@ -22,7 +22,7 @@ export const walletTopUpApproveMutation = gql`
 // Reject top-up request
 export const walletTopUpRejectMutation = gql`
   mutation WalletTopUpReject($id: ID!, $rejectionReason: String!, $staffNote: String) {
-    walletTopUpReject(id: $id, rejectionReason: $rejectionReason, staffNote: $staffNote) {
+    walletTopupReject(id: $id, rejectionReason: $rejectionReason, staffNote: $staffNote) {
       topupRequest {
         ...WalletTopUpRequest
       }
@@ -38,7 +38,7 @@ export const walletTopUpRejectMutation = gql`
 
 // Manual wallet adjustment (staff only)
 export const walletManualAdjustmentMutation = gql`
-  mutation WalletManualAdjustment($walletId: ID!, $amount: Decimal!, $reason: String!, $note: String) {
+  mutation WalletManualAdjustment($walletId: ID!, $amount: String!, $reason: String!, $note: String) {
     walletManualAdjustment(walletId: $walletId, amount: $amount, reason: $reason, note: $note) {
       wallet {
         ...Wallet
@@ -55,7 +55,7 @@ export const walletManualAdjustmentMutation = gql`
 
 // Refund to wallet
 export const walletRefundMutation = gql`
-  mutation WalletRefund($orderId: ID!, $amount: PositiveDecimal!, $reason: String) {
+  mutation WalletRefund($orderId: ID!, $amount: String!, $reason: String) {
     walletRefund(orderId: $orderId, amount: $amount, reason: $reason) {
       wallet {
         ...Wallet
@@ -93,7 +93,10 @@ export const walletApplyToCheckoutMutation = gql`
     walletApplyToCheckout(checkoutId: $checkoutId, amount: $amount) {
       checkout {
         id
-        walletAmount
+        walletAmount {
+          amount
+          currency
+        }
       }
       walletErrors {
         field
@@ -110,7 +113,10 @@ export const walletRemoveFromCheckoutMutation = gql`
     walletRemoveFromCheckout(checkoutId: $checkoutId) {
       checkout {
         id
-        walletAmount
+        walletAmount {
+          amount
+          currency
+        }
       }
       walletErrors {
         field

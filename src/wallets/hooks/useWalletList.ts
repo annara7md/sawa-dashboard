@@ -4,7 +4,7 @@ import { useMemo } from "react";
 
 import { wallets as mockWallets } from "../fixtures";
 import { walletListQuery } from "../queries";
-import { type WalletListFilters } from "../types";
+import { type Wallet, type WalletListFilters } from "../types";
 
 interface UseWalletListProps {
   first?: number;
@@ -25,7 +25,7 @@ export const useWalletList = (variables: UseWalletListProps) => {
     skip: useMockData,
   });
 
-  const wallets = useMemo(() => {
+  const wallets: Wallet[] | undefined = useMemo(() => {
     if (useMockData) {
       // Filter mock data based on query
       let filteredWallets = mockWallets;

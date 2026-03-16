@@ -4589,6 +4589,10 @@ export type Checkout = Node & ObjectWithMetadata & {
   voucher: Maybe<Voucher>;
   /** The code of voucher assigned to the checkout. */
   voucherCode: Maybe<Scalars['String']>;
+  /** Amount reserved from user's wallet for this checkout. */
+  walletAmount: Maybe<Money>;
+  /** Wallet reservation ID for this checkout. */
+  walletReservationId: Maybe<Scalars['String']>;
 };
 
 
@@ -14588,6 +14592,56 @@ export type Mutation = {
    */
   voucherUpdate: Maybe<VoucherUpdate>;
   /**
+   * Apply wallet balance to checkout.
+   *
+   * Added in Saleor 3.20.
+   */
+  walletApplyToCheckout: Maybe<WalletApplyToCheckout>;
+  /**
+   * Create manual wallet balance adjustment. Staff only.
+   *
+   * Requires one of the following permissions: HANDLE_PAYMENTS.
+   */
+  walletManualAdjustment: Maybe<WalletManualAdjustment>;
+  /**
+   * Refund order amount to customer's wallet.
+   *
+   * Added in Saleor 3.20.
+   *
+   * Requires one of the following permissions: HANDLE_PAYMENTS.
+   */
+  walletOrderRefund: Maybe<WalletOrderRefund>;
+  /**
+   * Refund amount back to wallet.
+   *
+   * Requires one of the following permissions: HANDLE_PAYMENTS.
+   */
+  walletRefund: Maybe<WalletRefund>;
+  /**
+   * Remove wallet balance from checkout.
+   *
+   * Added in Saleor 3.20.
+   */
+  walletRemoveFromCheckout: Maybe<WalletRemoveFromCheckout>;
+  /**
+   * Approve wallet top-up request and credit wallet.
+   *
+   * Requires one of the following permissions: HANDLE_PAYMENTS.
+   */
+  walletTopupApprove: Maybe<WalletTopUpApprove>;
+  /**
+   * Reject wallet top-up request.
+   *
+   * Requires one of the following permissions: HANDLE_PAYMENTS.
+   */
+  walletTopupReject: Maybe<WalletTopUpReject>;
+  /**
+   * Create wallet top-up request.
+   *
+   * Requires one of the following permissions: AUTHENTICATED_USER.
+   */
+  walletTopupRequestCreate: Maybe<WalletTopUpRequestCreate>;
+  /**
    * Creates a new webhook subscription.
    *
    * Requires one of the following permissions: MANAGE_APPS, AUTHENTICATED_APP.
@@ -16543,6 +16597,57 @@ export type MutationVoucherTranslateArgs = {
 export type MutationVoucherUpdateArgs = {
   id: Scalars['ID'];
   input: VoucherInput;
+};
+
+
+export type MutationWalletApplyToCheckoutArgs = {
+  amount: Scalars['String'];
+  checkoutId: Scalars['ID'];
+};
+
+
+export type MutationWalletManualAdjustmentArgs = {
+  amount: Scalars['String'];
+  note: InputMaybe<Scalars['String']>;
+  reason: Scalars['String'];
+  walletId: Scalars['ID'];
+};
+
+
+export type MutationWalletOrderRefundArgs = {
+  amount: Scalars['String'];
+  orderId: Scalars['ID'];
+  reason?: InputMaybe<Scalars['String']>;
+};
+
+
+export type MutationWalletRefundArgs = {
+  amount: Scalars['String'];
+  orderId: Scalars['ID'];
+  reason: InputMaybe<Scalars['String']>;
+};
+
+
+export type MutationWalletRemoveFromCheckoutArgs = {
+  checkoutId: Scalars['ID'];
+};
+
+
+export type MutationWalletTopupApproveArgs = {
+  id: Scalars['ID'];
+  staffNote: InputMaybe<Scalars['String']>;
+};
+
+
+export type MutationWalletTopupRejectArgs = {
+  id: Scalars['ID'];
+  rejectionReason: Scalars['String'];
+  staffNote: InputMaybe<Scalars['String']>;
+};
+
+
+export type MutationWalletTopupRequestCreateArgs = {
+  input: WalletTopUpRequestCreateInput;
 };
 
 
@@ -25204,6 +25309,30 @@ export type Query = {
    */
   vouchers: Maybe<VoucherCountableConnection>;
   /**
+   * Look up a wallet by ID.
+   *
+   * Requires one of the following permissions: HANDLE_PAYMENTS.
+   */
+  wallet: Maybe<Wallet>;
+  /**
+   * Look up a wallet top-up request by ID.
+   *
+   * Requires one of the following permissions: HANDLE_PAYMENTS.
+   */
+  walletTopupRequest: Maybe<WalletTopUpRequest>;
+  /**
+   * List of wallet top-up requests.
+   *
+   * Requires one of the following permissions: HANDLE_PAYMENTS.
+   */
+  walletTopupRequests: Maybe<WalletTopUpRequestCountableConnection>;
+  /**
+   * List of wallets.
+   *
+   * Requires one of the following permissions: HANDLE_PAYMENTS.
+   */
+  wallets: Maybe<WalletCountableConnection>;
+  /**
    * Look up a warehouse by ID.
    *
    * Requires one of the following permissions: MANAGE_PRODUCTS, MANAGE_ORDERS, MANAGE_SHIPPING.
@@ -25825,6 +25954,36 @@ export type QueryVouchersArgs = {
   last: InputMaybe<Scalars['Int']>;
   query: InputMaybe<Scalars['String']>;
   sortBy: InputMaybe<VoucherSortingInput>;
+};
+
+
+export type QueryWalletArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type QueryWalletTopupRequestArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type QueryWalletTopupRequestsArgs = {
+  after: InputMaybe<Scalars['String']>;
+  before: InputMaybe<Scalars['String']>;
+  filter: InputMaybe<WalletTopUpRequestFilterInput>;
+  first: InputMaybe<Scalars['Int']>;
+  last: InputMaybe<Scalars['Int']>;
+  sortBy: InputMaybe<WalletTopUpRequestSortingInput>;
+};
+
+
+export type QueryWalletsArgs = {
+  after: InputMaybe<Scalars['String']>;
+  before: InputMaybe<Scalars['String']>;
+  filter: InputMaybe<WalletFilterInput>;
+  first: InputMaybe<Scalars['Int']>;
+  last: InputMaybe<Scalars['Int']>;
+  sortBy: InputMaybe<WalletSortingInput>;
 };
 
 
@@ -30445,6 +30604,8 @@ export type User = Node & ObjectWithMetadata & {
   updatedAt: Scalars['DateTime'];
   /** List of user's permissions. */
   userPermissions: Maybe<Array<UserPermission>>;
+  /** User's wallet for the specified currency. */
+  wallet: Maybe<Wallet>;
 };
 
 
@@ -30529,6 +30690,12 @@ export type UserStoredPaymentMethodsArgs = {
 /** Represents user data. */
 export type UserStoredPaymentSourcesArgs = {
   channel: InputMaybe<Scalars['String']>;
+};
+
+
+/** Represents user data. */
+export type UserWalletArgs = {
+  currency: Scalars['String'];
 };
 
 /**
@@ -31506,6 +31673,492 @@ export type VoucherUpdated = Event & {
 export type VoucherUpdatedVoucherArgs = {
   channel: InputMaybe<Scalars['String']>;
 };
+
+/** Customer wallet for stored-value account. */
+export type Wallet = Node & ObjectWithMetadata & {
+  __typename: 'Wallet';
+  /** Balance breakdown. */
+  balance: WalletBalanceType;
+  /** Date and time when wallet was created. */
+  createdAt: Scalars['DateTime'];
+  /** Currency code for this wallet. */
+  currency: Scalars['String'];
+  /** Total current balance. */
+  currentBalance: Money;
+  /**
+   * Ledger entries for this wallet.
+   *
+   * Requires one of the following permissions: HANDLE_PAYMENTS.
+   */
+  entries: Array<WalletEntry>;
+  /**
+   * Timeline events for this wallet.
+   *
+   * Requires one of the following permissions: HANDLE_PAYMENTS.
+   */
+  events: Array<WalletEvent>;
+  /** ID of the wallet. */
+  id: Scalars['ID'];
+  /** Whether wallet is active. */
+  isActive: Scalars['Boolean'];
+  /** List of public metadata items. Can be accessed without permissions. */
+  metadata: Array<MetadataItem>;
+  /**
+   * A single key from public metadata.
+   *
+   * Tip: Use GraphQL aliases to fetch multiple keys.
+   */
+  metafield: Maybe<Scalars['String']>;
+  /** Public metadata. Use `keys` to control which fields you want to include. The default is to include everything. */
+  metafields: Maybe<Scalars['Metadata']>;
+  /** List of private metadata items. Requires staff permissions to access. */
+  privateMetadata: Array<MetadataItem>;
+  /**
+   * A single key from private metadata. Requires staff permissions to access.
+   *
+   * Tip: Use GraphQL aliases to fetch multiple keys.
+   */
+  privateMetafield: Maybe<Scalars['String']>;
+  /** Private metadata. Requires staff permissions to access. Use `keys` to control which fields you want to include. The default is to include everything. */
+  privateMetafields: Maybe<Scalars['Metadata']>;
+  /** Amount currently reserved. */
+  reservedBalance: Money;
+  /** Available balance that can be spent. */
+  spendableBalance: Money;
+  /** Date and time when wallet was last updated. */
+  updatedAt: Scalars['DateTime'];
+  /** User who owns this wallet. */
+  user: User;
+};
+
+
+/** Customer wallet for stored-value account. */
+export type WalletMetafieldArgs = {
+  key: Scalars['String'];
+};
+
+
+/** Customer wallet for stored-value account. */
+export type WalletMetafieldsArgs = {
+  keys: InputMaybe<Array<Scalars['String']>>;
+};
+
+
+/** Customer wallet for stored-value account. */
+export type WalletPrivateMetafieldArgs = {
+  key: Scalars['String'];
+};
+
+
+/** Customer wallet for stored-value account. */
+export type WalletPrivateMetafieldsArgs = {
+  keys: InputMaybe<Array<Scalars['String']>>;
+};
+
+/**
+ * Apply wallet balance to checkout.
+ *
+ * Added in Saleor 3.20.
+ */
+export type WalletApplyToCheckout = {
+  __typename: 'WalletApplyToCheckout';
+  /** Updated checkout. */
+  checkout: Maybe<Checkout>;
+  errors: Array<WalletError>;
+  /** @deprecated Use `errors` field instead. */
+  walletErrors: Array<WalletError>;
+};
+
+/** Wallet balance breakdown. */
+export type WalletBalanceType = {
+  __typename: 'WalletBalanceType';
+  /** Total current balance in wallet. */
+  currentBalance: Money;
+  /** Amount currently reserved (held during checkout). */
+  reservedBalance: Money;
+  /** Available balance that can be spent (current - reserved). */
+  spendableBalance: Money;
+};
+
+export type WalletCountableConnection = {
+  __typename: 'WalletCountableConnection';
+  edges: Array<WalletCountableEdge>;
+  /** Pagination data for this connection. */
+  pageInfo: PageInfo;
+  /** A total count of items in the collection. */
+  totalCount: Maybe<Scalars['Int']>;
+};
+
+export type WalletCountableEdge = {
+  __typename: 'WalletCountableEdge';
+  /** A cursor for use in pagination. */
+  cursor: Scalars['String'];
+  /** The item at the end of the edge. */
+  node: Wallet;
+};
+
+/** Immutable ledger entry for wallet balance changes. */
+export type WalletEntry = Node & {
+  __typename: 'WalletEntry';
+  /** Amount of this entry. */
+  amount: Money;
+  /** Wallet balance after this entry. */
+  balanceAfter: Money;
+  /** Related checkout if applicable. */
+  checkout: Maybe<Checkout>;
+  /** Date and time when entry was created. */
+  createdAt: Scalars['DateTime'];
+  /** App that created this entry. */
+  createdByApp: Maybe<App>;
+  /** User who created this entry. */
+  createdByUser: Maybe<User>;
+  /** Type of entry (credit, debit, reserve, release, refund, adjustment). */
+  entryType: Scalars['String'];
+  /** ID of the entry. */
+  id: Scalars['ID'];
+  /** Additional note. */
+  note: Maybe<Scalars['String']>;
+  /** Related order if applicable. */
+  order: Maybe<Order>;
+  /** Reason for this entry. */
+  reason: Maybe<Scalars['String']>;
+  /** Reserved balance after this entry. */
+  reservedAfter: Money;
+  /** Related top-up request if applicable. */
+  topupRequest: Maybe<WalletTopUpRequest>;
+  /** Wallet this entry belongs to. */
+  wallet: Wallet;
+};
+
+/** Wallet error type. */
+export type WalletError = {
+  __typename: 'WalletError';
+  /** The error code. */
+  code: WalletErrorCode;
+  /** Name of a field that caused the error. A value of `null` indicates that the error isn't associated with a particular field. */
+  field: Maybe<Scalars['String']>;
+  /** The error message. */
+  message: Maybe<Scalars['String']>;
+};
+
+/** Wallet error codes. */
+export type WalletErrorCode =
+  | 'CHECKOUT_NOT_FOUND'
+  | 'CURRENCY_MISMATCH'
+  | 'DUPLICATE_OPERATION'
+  | 'GRAPHQL_ERROR'
+  | 'IDEMPOTENCY_KEY_MISMATCH'
+  | 'INSUFFICIENT_BALANCE'
+  | 'INSUFFICIENT_SPENDABLE_BALANCE'
+  | 'INVALID'
+  | 'INVALID_AMOUNT'
+  | 'INVALID_CHECKOUT_STATE'
+  | 'INVALID_ORDER_STATE'
+  | 'NEGATIVE_BALANCE_NOT_ALLOWED'
+  | 'NOT_FOUND'
+  | 'ORDER_NOT_FOUND'
+  | 'PERMISSION_DENIED'
+  | 'REFUND_AMOUNT_EXCEEDS_PAYMENT'
+  | 'REFUND_NOT_ALLOWED'
+  | 'REQUIRED'
+  | 'RESERVATION_ALREADY_EXISTS'
+  | 'RESERVATION_INVALID_STATE'
+  | 'RESERVATION_NOT_FOUND'
+  | 'TOPUP_ALREADY_PROCESSED'
+  | 'TOPUP_CANNOT_BE_APPROVED'
+  | 'TOPUP_CANNOT_BE_REJECTED'
+  | 'TOPUP_INVALID_STATUS_TRANSITION'
+  | 'TOPUP_NOT_FOUND'
+  | 'WALLET_INACTIVE'
+  | 'WALLET_NOT_FOUND';
+
+/** Timeline event for wallet activity. */
+export type WalletEvent = Node & {
+  __typename: 'WalletEvent';
+  /** App that performed the action. */
+  app: Maybe<App>;
+  /** Related checkout if applicable. */
+  checkout: Maybe<Checkout>;
+  /** Date when event happened. */
+  date: Scalars['DateTime'];
+  /** ID of the event. */
+  id: Scalars['ID'];
+  /** Related order if applicable. */
+  order: Maybe<Order>;
+  /** Event parameters. */
+  parameters: Maybe<Scalars['JSONString']>;
+  /** Related top-up request if applicable. */
+  topupRequest: Maybe<WalletTopUpRequest>;
+  /** Wallet event type. */
+  type: WalletEventsEnum;
+  /** User who performed the action. */
+  user: Maybe<User>;
+  /** Wallet this event belongs to. */
+  wallet: Wallet;
+};
+
+/** Wallet event types. */
+export type WalletEventsEnum =
+  | 'CREDITED'
+  | 'DEBITED'
+  | 'MANUAL_ADJUSTMENT'
+  | 'NOTE_ADDED'
+  | 'REFUNDED'
+  | 'RESERVATION_RELEASED'
+  | 'RESERVED'
+  | 'TOPUP_APPROVED'
+  | 'TOPUP_REJECTED'
+  | 'TOPUP_REQUESTED';
+
+/** Input for filtering wallets. */
+export type WalletFilterInput = {
+  /** Filter by currency code. */
+  currency: InputMaybe<Scalars['String']>;
+  /** Filter by active status. */
+  isActive: InputMaybe<Scalars['Boolean']>;
+  metadata: InputMaybe<Array<MetadataFilter>>;
+  /** Filter by user ID. */
+  user: InputMaybe<Array<Scalars['ID']>>;
+};
+
+/**
+ * Create manual wallet balance adjustment. Staff only.
+ *
+ * Requires one of the following permissions: HANDLE_PAYMENTS.
+ */
+export type WalletManualAdjustment = {
+  __typename: 'WalletManualAdjustment';
+  errors: Array<WalletError>;
+  /** Updated wallet. */
+  wallet: Maybe<Wallet>;
+  /** @deprecated Use `errors` field instead. */
+  walletErrors: Array<WalletError>;
+};
+
+/**
+ * Refund order amount to customer's wallet.
+ *
+ * Added in Saleor 3.20.
+ *
+ * Requires one of the following permissions: HANDLE_PAYMENTS.
+ */
+export type WalletOrderRefund = {
+  __typename: 'WalletOrderRefund';
+  errors: Array<WalletError>;
+  /** Updated order. */
+  order: Maybe<Order>;
+  /** @deprecated Use `errors` field instead. */
+  walletErrors: Array<WalletError>;
+};
+
+/**
+ * Refund amount back to wallet.
+ *
+ * Requires one of the following permissions: HANDLE_PAYMENTS.
+ */
+export type WalletRefund = {
+  __typename: 'WalletRefund';
+  errors: Array<WalletError>;
+  /** Updated wallet. */
+  wallet: Maybe<Wallet>;
+  /** @deprecated Use `errors` field instead. */
+  walletErrors: Array<WalletError>;
+};
+
+/**
+ * Remove wallet balance from checkout.
+ *
+ * Added in Saleor 3.20.
+ */
+export type WalletRemoveFromCheckout = {
+  __typename: 'WalletRemoveFromCheckout';
+  /** Updated checkout. */
+  checkout: Maybe<Checkout>;
+  errors: Array<WalletError>;
+  /** @deprecated Use `errors` field instead. */
+  walletErrors: Array<WalletError>;
+};
+
+/** Input for sorting wallets. */
+export type WalletSortingInput = {
+  /** Specifies the direction in which to sort. */
+  direction: OrderDirection;
+};
+
+/**
+ * Approve wallet top-up request and credit wallet.
+ *
+ * Requires one of the following permissions: HANDLE_PAYMENTS.
+ */
+export type WalletTopUpApprove = {
+  __typename: 'WalletTopUpApprove';
+  errors: Array<WalletError>;
+  /** Approved top-up request. */
+  topupRequest: Maybe<WalletTopUpRequest>;
+  /** @deprecated Use `errors` field instead. */
+  walletErrors: Array<WalletError>;
+};
+
+/**
+ * Reject wallet top-up request.
+ *
+ * Requires one of the following permissions: HANDLE_PAYMENTS.
+ */
+export type WalletTopUpReject = {
+  __typename: 'WalletTopUpReject';
+  errors: Array<WalletError>;
+  /** Rejected top-up request. */
+  topupRequest: Maybe<WalletTopUpRequest>;
+  /** @deprecated Use `errors` field instead. */
+  walletErrors: Array<WalletError>;
+};
+
+/** Request to top up wallet balance via bank transfer. */
+export type WalletTopUpRequest = Node & ObjectWithMetadata & {
+  __typename: 'WalletTopUpRequest';
+  /** Amount to top up. */
+  amount: Money;
+  /** External bank transfer reference number. */
+  bankReference: Maybe<Scalars['String']>;
+  /** Date and time when request was created. */
+  createdAt: Scalars['DateTime'];
+  /** Note from customer about this top-up. */
+  customerNote: Maybe<Scalars['String']>;
+  /**
+   * Events related to this top-up request.
+   *
+   * Requires one of the following permissions: HANDLE_PAYMENTS.
+   */
+  events: Array<WalletEvent>;
+  /** ID of the request. */
+  id: Scalars['ID'];
+  /** List of public metadata items. Can be accessed without permissions. */
+  metadata: Array<MetadataItem>;
+  /**
+   * A single key from public metadata.
+   *
+   * Tip: Use GraphQL aliases to fetch multiple keys.
+   */
+  metafield: Maybe<Scalars['String']>;
+  /** Public metadata. Use `keys` to control which fields you want to include. The default is to include everything. */
+  metafields: Maybe<Scalars['Metadata']>;
+  /** List of private metadata items. Requires staff permissions to access. */
+  privateMetadata: Array<MetadataItem>;
+  /**
+   * A single key from private metadata. Requires staff permissions to access.
+   *
+   * Tip: Use GraphQL aliases to fetch multiple keys.
+   */
+  privateMetafield: Maybe<Scalars['String']>;
+  /** Private metadata. Requires staff permissions to access. Use `keys` to control which fields you want to include. The default is to include everything. */
+  privateMetafields: Maybe<Scalars['Metadata']>;
+  /** Reason for rejection (visible to customer). */
+  rejectionReason: Maybe<Scalars['String']>;
+  /** Date and time when request was reviewed. */
+  reviewedAt: Maybe<Scalars['DateTime']>;
+  /** Staff user who reviewed this request. */
+  reviewedBy: Maybe<User>;
+  /** App that reviewed this request. */
+  reviewedByApp: Maybe<App>;
+  /** Internal note from staff reviewer. */
+  staffNote: Maybe<Scalars['String']>;
+  /** Status of the request. */
+  status: WalletTopUpStatusEnum;
+  /** Internal transfer reference. */
+  transferReference: Maybe<Scalars['String']>;
+  /** Date and time when request was last updated. */
+  updatedAt: Scalars['DateTime'];
+  /** Wallet to top up. */
+  wallet: Wallet;
+};
+
+
+/** Request to top up wallet balance via bank transfer. */
+export type WalletTopUpRequestMetafieldArgs = {
+  key: Scalars['String'];
+};
+
+
+/** Request to top up wallet balance via bank transfer. */
+export type WalletTopUpRequestMetafieldsArgs = {
+  keys: InputMaybe<Array<Scalars['String']>>;
+};
+
+
+/** Request to top up wallet balance via bank transfer. */
+export type WalletTopUpRequestPrivateMetafieldArgs = {
+  key: Scalars['String'];
+};
+
+
+/** Request to top up wallet balance via bank transfer. */
+export type WalletTopUpRequestPrivateMetafieldsArgs = {
+  keys: InputMaybe<Array<Scalars['String']>>;
+};
+
+export type WalletTopUpRequestCountableConnection = {
+  __typename: 'WalletTopUpRequestCountableConnection';
+  edges: Array<WalletTopUpRequestCountableEdge>;
+  /** Pagination data for this connection. */
+  pageInfo: PageInfo;
+  /** A total count of items in the collection. */
+  totalCount: Maybe<Scalars['Int']>;
+};
+
+export type WalletTopUpRequestCountableEdge = {
+  __typename: 'WalletTopUpRequestCountableEdge';
+  /** A cursor for use in pagination. */
+  cursor: Scalars['String'];
+  /** The item at the end of the edge. */
+  node: WalletTopUpRequest;
+};
+
+/**
+ * Create wallet top-up request.
+ *
+ * Requires one of the following permissions: AUTHENTICATED_USER.
+ */
+export type WalletTopUpRequestCreate = {
+  __typename: 'WalletTopUpRequestCreate';
+  errors: Array<WalletError>;
+  /** Created top-up request. */
+  topupRequest: Maybe<WalletTopUpRequest>;
+  /** @deprecated Use `errors` field instead. */
+  walletErrors: Array<WalletError>;
+};
+
+/** Input for creating wallet top-up request. */
+export type WalletTopUpRequestCreateInput = {
+  /** Amount to top up. */
+  amount: Scalars['String'];
+  /** External bank transfer reference number. */
+  bankReference: InputMaybe<Scalars['String']>;
+  /** Currency code for the wallet. */
+  currency: Scalars['String'];
+  /** Note from customer about this top-up. */
+  customerNote: InputMaybe<Scalars['String']>;
+};
+
+/** Input for filtering wallet top-up requests. */
+export type WalletTopUpRequestFilterInput = {
+  metadata: InputMaybe<Array<MetadataFilter>>;
+  /** Filter by status. */
+  status: InputMaybe<Scalars['String']>;
+  /** Filter by wallet ID. */
+  wallet: InputMaybe<Array<Scalars['ID']>>;
+};
+
+/** Input for sorting wallet top-up requests. */
+export type WalletTopUpRequestSortingInput = {
+  /** Specifies the direction in which to sort. */
+  direction: OrderDirection;
+};
+
+/** Wallet top-up request status. */
+export type WalletTopUpStatusEnum =
+  | 'APPROVED'
+  | 'PENDING'
+  | 'REJECTED';
 
 /** Represents warehouse. */
 export type Warehouse = Node & ObjectWithMetadata & {

@@ -3803,6 +3803,150 @@ export const MenuItemTranslationFragmentDoc = gql`
   }
 }
     `;
+export const WalletFragmentDoc = gql`
+    fragment Wallet on Wallet {
+  id
+  user {
+    id
+    email
+    firstName
+    lastName
+  }
+  currency
+  currentBalance {
+    amount
+    currency
+  }
+  reservedBalance {
+    amount
+    currency
+  }
+  spendableBalance {
+    amount
+    currency
+  }
+  balance {
+    currentBalance {
+      amount
+      currency
+    }
+    reservedBalance {
+      amount
+      currency
+    }
+    spendableBalance {
+      amount
+      currency
+    }
+  }
+  isActive
+  createdAt
+  updatedAt
+}
+    `;
+export const WalletTopUpRequestFragmentDoc = gql`
+    fragment WalletTopUpRequest on WalletTopUpRequest {
+  id
+  wallet {
+    ...Wallet
+  }
+  status
+  amount {
+    amount
+    currency
+  }
+  bankReference
+  transferReference
+  customerNote
+  reviewedBy {
+    id
+    email
+    firstName
+    lastName
+  }
+  reviewedByApp {
+    id
+    name
+  }
+  reviewedAt
+  staffNote
+  rejectionReason
+  createdAt
+  updatedAt
+}
+    ${WalletFragmentDoc}`;
+export const WalletEntryFragmentDoc = gql`
+    fragment WalletEntry on WalletEntry {
+  id
+  entryType
+  amount {
+    amount
+    currency
+  }
+  balanceAfter {
+    amount
+    currency
+  }
+  reservedAfter {
+    amount
+    currency
+  }
+  createdByUser {
+    id
+    email
+  }
+  createdByApp {
+    id
+    name
+  }
+  order {
+    id
+    number
+  }
+  checkout {
+    id
+  }
+  reason
+  note
+  createdAt
+}
+    `;
+export const WalletEventFragmentDoc = gql`
+    fragment WalletEvent on WalletEvent {
+  id
+  date
+  type
+  user {
+    id
+    email
+  }
+  app {
+    id
+    name
+  }
+  order {
+    id
+    number
+  }
+  checkout {
+    id
+  }
+  parameters
+}
+    `;
+export const WalletDetailsFragmentDoc = gql`
+    fragment WalletDetails on Wallet {
+  ...Wallet
+  entries {
+    ...WalletEntry
+  }
+  events {
+    ...WalletEvent
+  }
+}
+    ${WalletFragmentDoc}
+${WalletEntryFragmentDoc}
+${WalletEventFragmentDoc}`;
 export const WarehouseWithShippingFragmentDoc = gql`
     fragment WarehouseWithShipping on Warehouse {
   ...Warehouse
@@ -21408,6 +21552,554 @@ export function useUpdatePrivateMetadataMutation(baseOptions?: ApolloReactHooks.
 export type UpdatePrivateMetadataMutationHookResult = ReturnType<typeof useUpdatePrivateMetadataMutation>;
 export type UpdatePrivateMetadataMutationResult = Apollo.MutationResult<Types.UpdatePrivateMetadataMutation>;
 export type UpdatePrivateMetadataMutationOptions = Apollo.BaseMutationOptions<Types.UpdatePrivateMetadataMutation, Types.UpdatePrivateMetadataMutationVariables>;
+export const WalletTopUpApproveDocument = gql`
+    mutation WalletTopUpApprove($id: ID!, $staffNote: String) {
+  walletTopupApprove(id: $id, staffNote: $staffNote) {
+    topupRequest {
+      ...WalletTopUpRequest
+    }
+    walletErrors {
+      field
+      message
+      code
+    }
+  }
+}
+    ${WalletTopUpRequestFragmentDoc}`;
+export type WalletTopUpApproveMutationFn = Apollo.MutationFunction<Types.WalletTopUpApproveMutation, Types.WalletTopUpApproveMutationVariables>;
+
+/**
+ * __useWalletTopUpApproveMutation__
+ *
+ * To run a mutation, you first call `useWalletTopUpApproveMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useWalletTopUpApproveMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [walletTopUpApproveMutation, { data, loading, error }] = useWalletTopUpApproveMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      staffNote: // value for 'staffNote'
+ *   },
+ * });
+ */
+export function useWalletTopUpApproveMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<Types.WalletTopUpApproveMutation, Types.WalletTopUpApproveMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useMutation<Types.WalletTopUpApproveMutation, Types.WalletTopUpApproveMutationVariables>(WalletTopUpApproveDocument, options);
+      }
+export type WalletTopUpApproveMutationHookResult = ReturnType<typeof useWalletTopUpApproveMutation>;
+export type WalletTopUpApproveMutationResult = Apollo.MutationResult<Types.WalletTopUpApproveMutation>;
+export type WalletTopUpApproveMutationOptions = Apollo.BaseMutationOptions<Types.WalletTopUpApproveMutation, Types.WalletTopUpApproveMutationVariables>;
+export const WalletTopUpRejectDocument = gql`
+    mutation WalletTopUpReject($id: ID!, $rejectionReason: String!, $staffNote: String) {
+  walletTopupReject(
+    id: $id
+    rejectionReason: $rejectionReason
+    staffNote: $staffNote
+  ) {
+    topupRequest {
+      ...WalletTopUpRequest
+    }
+    walletErrors {
+      field
+      message
+      code
+    }
+  }
+}
+    ${WalletTopUpRequestFragmentDoc}`;
+export type WalletTopUpRejectMutationFn = Apollo.MutationFunction<Types.WalletTopUpRejectMutation, Types.WalletTopUpRejectMutationVariables>;
+
+/**
+ * __useWalletTopUpRejectMutation__
+ *
+ * To run a mutation, you first call `useWalletTopUpRejectMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useWalletTopUpRejectMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [walletTopUpRejectMutation, { data, loading, error }] = useWalletTopUpRejectMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      rejectionReason: // value for 'rejectionReason'
+ *      staffNote: // value for 'staffNote'
+ *   },
+ * });
+ */
+export function useWalletTopUpRejectMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<Types.WalletTopUpRejectMutation, Types.WalletTopUpRejectMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useMutation<Types.WalletTopUpRejectMutation, Types.WalletTopUpRejectMutationVariables>(WalletTopUpRejectDocument, options);
+      }
+export type WalletTopUpRejectMutationHookResult = ReturnType<typeof useWalletTopUpRejectMutation>;
+export type WalletTopUpRejectMutationResult = Apollo.MutationResult<Types.WalletTopUpRejectMutation>;
+export type WalletTopUpRejectMutationOptions = Apollo.BaseMutationOptions<Types.WalletTopUpRejectMutation, Types.WalletTopUpRejectMutationVariables>;
+export const WalletManualAdjustmentDocument = gql`
+    mutation WalletManualAdjustment($walletId: ID!, $amount: String!, $reason: String!, $note: String) {
+  walletManualAdjustment(
+    walletId: $walletId
+    amount: $amount
+    reason: $reason
+    note: $note
+  ) {
+    wallet {
+      ...Wallet
+    }
+    walletErrors {
+      field
+      message
+      code
+    }
+  }
+}
+    ${WalletFragmentDoc}`;
+export type WalletManualAdjustmentMutationFn = Apollo.MutationFunction<Types.WalletManualAdjustmentMutation, Types.WalletManualAdjustmentMutationVariables>;
+
+/**
+ * __useWalletManualAdjustmentMutation__
+ *
+ * To run a mutation, you first call `useWalletManualAdjustmentMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useWalletManualAdjustmentMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [walletManualAdjustmentMutation, { data, loading, error }] = useWalletManualAdjustmentMutation({
+ *   variables: {
+ *      walletId: // value for 'walletId'
+ *      amount: // value for 'amount'
+ *      reason: // value for 'reason'
+ *      note: // value for 'note'
+ *   },
+ * });
+ */
+export function useWalletManualAdjustmentMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<Types.WalletManualAdjustmentMutation, Types.WalletManualAdjustmentMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useMutation<Types.WalletManualAdjustmentMutation, Types.WalletManualAdjustmentMutationVariables>(WalletManualAdjustmentDocument, options);
+      }
+export type WalletManualAdjustmentMutationHookResult = ReturnType<typeof useWalletManualAdjustmentMutation>;
+export type WalletManualAdjustmentMutationResult = Apollo.MutationResult<Types.WalletManualAdjustmentMutation>;
+export type WalletManualAdjustmentMutationOptions = Apollo.BaseMutationOptions<Types.WalletManualAdjustmentMutation, Types.WalletManualAdjustmentMutationVariables>;
+export const WalletRefundDocument = gql`
+    mutation WalletRefund($orderId: ID!, $amount: String!, $reason: String) {
+  walletRefund(orderId: $orderId, amount: $amount, reason: $reason) {
+    wallet {
+      ...Wallet
+    }
+    walletErrors {
+      field
+      message
+      code
+    }
+  }
+}
+    ${WalletFragmentDoc}`;
+export type WalletRefundMutationFn = Apollo.MutationFunction<Types.WalletRefundMutation, Types.WalletRefundMutationVariables>;
+
+/**
+ * __useWalletRefundMutation__
+ *
+ * To run a mutation, you first call `useWalletRefundMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useWalletRefundMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [walletRefundMutation, { data, loading, error }] = useWalletRefundMutation({
+ *   variables: {
+ *      orderId: // value for 'orderId'
+ *      amount: // value for 'amount'
+ *      reason: // value for 'reason'
+ *   },
+ * });
+ */
+export function useWalletRefundMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<Types.WalletRefundMutation, Types.WalletRefundMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useMutation<Types.WalletRefundMutation, Types.WalletRefundMutationVariables>(WalletRefundDocument, options);
+      }
+export type WalletRefundMutationHookResult = ReturnType<typeof useWalletRefundMutation>;
+export type WalletRefundMutationResult = Apollo.MutationResult<Types.WalletRefundMutation>;
+export type WalletRefundMutationOptions = Apollo.BaseMutationOptions<Types.WalletRefundMutation, Types.WalletRefundMutationVariables>;
+export const WalletOrderRefundDocument = gql`
+    mutation WalletOrderRefund($orderId: ID!, $amount: String!, $reason: String) {
+  walletOrderRefund(orderId: $orderId, amount: $amount, reason: $reason) {
+    order {
+      id
+      number
+    }
+    walletErrors {
+      field
+      message
+      code
+    }
+  }
+}
+    `;
+export type WalletOrderRefundMutationFn = Apollo.MutationFunction<Types.WalletOrderRefundMutation, Types.WalletOrderRefundMutationVariables>;
+
+/**
+ * __useWalletOrderRefundMutation__
+ *
+ * To run a mutation, you first call `useWalletOrderRefundMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useWalletOrderRefundMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [walletOrderRefundMutation, { data, loading, error }] = useWalletOrderRefundMutation({
+ *   variables: {
+ *      orderId: // value for 'orderId'
+ *      amount: // value for 'amount'
+ *      reason: // value for 'reason'
+ *   },
+ * });
+ */
+export function useWalletOrderRefundMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<Types.WalletOrderRefundMutation, Types.WalletOrderRefundMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useMutation<Types.WalletOrderRefundMutation, Types.WalletOrderRefundMutationVariables>(WalletOrderRefundDocument, options);
+      }
+export type WalletOrderRefundMutationHookResult = ReturnType<typeof useWalletOrderRefundMutation>;
+export type WalletOrderRefundMutationResult = Apollo.MutationResult<Types.WalletOrderRefundMutation>;
+export type WalletOrderRefundMutationOptions = Apollo.BaseMutationOptions<Types.WalletOrderRefundMutation, Types.WalletOrderRefundMutationVariables>;
+export const WalletApplyToCheckoutDocument = gql`
+    mutation WalletApplyToCheckout($checkoutId: ID!, $amount: String!) {
+  walletApplyToCheckout(checkoutId: $checkoutId, amount: $amount) {
+    checkout {
+      id
+      walletAmount {
+        amount
+        currency
+      }
+    }
+    walletErrors {
+      field
+      message
+      code
+    }
+  }
+}
+    `;
+export type WalletApplyToCheckoutMutationFn = Apollo.MutationFunction<Types.WalletApplyToCheckoutMutation, Types.WalletApplyToCheckoutMutationVariables>;
+
+/**
+ * __useWalletApplyToCheckoutMutation__
+ *
+ * To run a mutation, you first call `useWalletApplyToCheckoutMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useWalletApplyToCheckoutMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [walletApplyToCheckoutMutation, { data, loading, error }] = useWalletApplyToCheckoutMutation({
+ *   variables: {
+ *      checkoutId: // value for 'checkoutId'
+ *      amount: // value for 'amount'
+ *   },
+ * });
+ */
+export function useWalletApplyToCheckoutMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<Types.WalletApplyToCheckoutMutation, Types.WalletApplyToCheckoutMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useMutation<Types.WalletApplyToCheckoutMutation, Types.WalletApplyToCheckoutMutationVariables>(WalletApplyToCheckoutDocument, options);
+      }
+export type WalletApplyToCheckoutMutationHookResult = ReturnType<typeof useWalletApplyToCheckoutMutation>;
+export type WalletApplyToCheckoutMutationResult = Apollo.MutationResult<Types.WalletApplyToCheckoutMutation>;
+export type WalletApplyToCheckoutMutationOptions = Apollo.BaseMutationOptions<Types.WalletApplyToCheckoutMutation, Types.WalletApplyToCheckoutMutationVariables>;
+export const WalletRemoveFromCheckoutDocument = gql`
+    mutation WalletRemoveFromCheckout($checkoutId: ID!) {
+  walletRemoveFromCheckout(checkoutId: $checkoutId) {
+    checkout {
+      id
+      walletAmount {
+        amount
+        currency
+      }
+    }
+    walletErrors {
+      field
+      message
+      code
+    }
+  }
+}
+    `;
+export type WalletRemoveFromCheckoutMutationFn = Apollo.MutationFunction<Types.WalletRemoveFromCheckoutMutation, Types.WalletRemoveFromCheckoutMutationVariables>;
+
+/**
+ * __useWalletRemoveFromCheckoutMutation__
+ *
+ * To run a mutation, you first call `useWalletRemoveFromCheckoutMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useWalletRemoveFromCheckoutMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [walletRemoveFromCheckoutMutation, { data, loading, error }] = useWalletRemoveFromCheckoutMutation({
+ *   variables: {
+ *      checkoutId: // value for 'checkoutId'
+ *   },
+ * });
+ */
+export function useWalletRemoveFromCheckoutMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<Types.WalletRemoveFromCheckoutMutation, Types.WalletRemoveFromCheckoutMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useMutation<Types.WalletRemoveFromCheckoutMutation, Types.WalletRemoveFromCheckoutMutationVariables>(WalletRemoveFromCheckoutDocument, options);
+      }
+export type WalletRemoveFromCheckoutMutationHookResult = ReturnType<typeof useWalletRemoveFromCheckoutMutation>;
+export type WalletRemoveFromCheckoutMutationResult = Apollo.MutationResult<Types.WalletRemoveFromCheckoutMutation>;
+export type WalletRemoveFromCheckoutMutationOptions = Apollo.BaseMutationOptions<Types.WalletRemoveFromCheckoutMutation, Types.WalletRemoveFromCheckoutMutationVariables>;
+export const WalletListDocument = gql`
+    query WalletList($first: Int, $after: String, $last: Int, $before: String, $filter: WalletFilterInput, $sortBy: WalletSortingInput) {
+  wallets(
+    first: $first
+    after: $after
+    last: $last
+    before: $before
+    filter: $filter
+    sortBy: $sortBy
+  ) {
+    edges {
+      node {
+        ...Wallet
+      }
+    }
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+    totalCount
+  }
+}
+    ${WalletFragmentDoc}`;
+
+/**
+ * __useWalletListQuery__
+ *
+ * To run a query within a React component, call `useWalletListQuery` and pass it any options that fit your needs.
+ * When your component renders, `useWalletListQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useWalletListQuery({
+ *   variables: {
+ *      first: // value for 'first'
+ *      after: // value for 'after'
+ *      last: // value for 'last'
+ *      before: // value for 'before'
+ *      filter: // value for 'filter'
+ *      sortBy: // value for 'sortBy'
+ *   },
+ * });
+ */
+export function useWalletListQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<Types.WalletListQuery, Types.WalletListQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<Types.WalletListQuery, Types.WalletListQueryVariables>(WalletListDocument, options);
+      }
+export function useWalletListLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<Types.WalletListQuery, Types.WalletListQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<Types.WalletListQuery, Types.WalletListQueryVariables>(WalletListDocument, options);
+        }
+export type WalletListQueryHookResult = ReturnType<typeof useWalletListQuery>;
+export type WalletListLazyQueryHookResult = ReturnType<typeof useWalletListLazyQuery>;
+export type WalletListQueryResult = Apollo.QueryResult<Types.WalletListQuery, Types.WalletListQueryVariables>;
+export const WalletDetailsDocument = gql`
+    query WalletDetails($id: ID!) {
+  wallet(id: $id) {
+    ...WalletDetails
+  }
+}
+    ${WalletDetailsFragmentDoc}`;
+
+/**
+ * __useWalletDetailsQuery__
+ *
+ * To run a query within a React component, call `useWalletDetailsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useWalletDetailsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useWalletDetailsQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useWalletDetailsQuery(baseOptions: ApolloReactHooks.QueryHookOptions<Types.WalletDetailsQuery, Types.WalletDetailsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<Types.WalletDetailsQuery, Types.WalletDetailsQueryVariables>(WalletDetailsDocument, options);
+      }
+export function useWalletDetailsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<Types.WalletDetailsQuery, Types.WalletDetailsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<Types.WalletDetailsQuery, Types.WalletDetailsQueryVariables>(WalletDetailsDocument, options);
+        }
+export type WalletDetailsQueryHookResult = ReturnType<typeof useWalletDetailsQuery>;
+export type WalletDetailsLazyQueryHookResult = ReturnType<typeof useWalletDetailsLazyQuery>;
+export type WalletDetailsQueryResult = Apollo.QueryResult<Types.WalletDetailsQuery, Types.WalletDetailsQueryVariables>;
+export const WalletTopUpRequestListDocument = gql`
+    query WalletTopUpRequestList($first: Int, $after: String, $last: Int, $before: String, $filter: WalletTopUpRequestFilterInput, $sortBy: WalletTopUpRequestSortingInput) {
+  walletTopupRequests(
+    first: $first
+    after: $after
+    last: $last
+    before: $before
+    filter: $filter
+    sortBy: $sortBy
+  ) {
+    edges {
+      node {
+        ...WalletTopUpRequest
+      }
+    }
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+    totalCount
+  }
+}
+    ${WalletTopUpRequestFragmentDoc}`;
+
+/**
+ * __useWalletTopUpRequestListQuery__
+ *
+ * To run a query within a React component, call `useWalletTopUpRequestListQuery` and pass it any options that fit your needs.
+ * When your component renders, `useWalletTopUpRequestListQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useWalletTopUpRequestListQuery({
+ *   variables: {
+ *      first: // value for 'first'
+ *      after: // value for 'after'
+ *      last: // value for 'last'
+ *      before: // value for 'before'
+ *      filter: // value for 'filter'
+ *      sortBy: // value for 'sortBy'
+ *   },
+ * });
+ */
+export function useWalletTopUpRequestListQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<Types.WalletTopUpRequestListQuery, Types.WalletTopUpRequestListQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<Types.WalletTopUpRequestListQuery, Types.WalletTopUpRequestListQueryVariables>(WalletTopUpRequestListDocument, options);
+      }
+export function useWalletTopUpRequestListLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<Types.WalletTopUpRequestListQuery, Types.WalletTopUpRequestListQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<Types.WalletTopUpRequestListQuery, Types.WalletTopUpRequestListQueryVariables>(WalletTopUpRequestListDocument, options);
+        }
+export type WalletTopUpRequestListQueryHookResult = ReturnType<typeof useWalletTopUpRequestListQuery>;
+export type WalletTopUpRequestListLazyQueryHookResult = ReturnType<typeof useWalletTopUpRequestListLazyQuery>;
+export type WalletTopUpRequestListQueryResult = Apollo.QueryResult<Types.WalletTopUpRequestListQuery, Types.WalletTopUpRequestListQueryVariables>;
+export const WalletTopUpRequestDetailsDocument = gql`
+    query WalletTopUpRequestDetails($id: ID!) {
+  walletTopupRequest(id: $id) {
+    ...WalletTopUpRequest
+    events {
+      id
+      date
+      type
+      user {
+        id
+        email
+      }
+      app {
+        id
+        name
+      }
+      parameters
+    }
+  }
+}
+    ${WalletTopUpRequestFragmentDoc}`;
+
+/**
+ * __useWalletTopUpRequestDetailsQuery__
+ *
+ * To run a query within a React component, call `useWalletTopUpRequestDetailsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useWalletTopUpRequestDetailsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useWalletTopUpRequestDetailsQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useWalletTopUpRequestDetailsQuery(baseOptions: ApolloReactHooks.QueryHookOptions<Types.WalletTopUpRequestDetailsQuery, Types.WalletTopUpRequestDetailsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<Types.WalletTopUpRequestDetailsQuery, Types.WalletTopUpRequestDetailsQueryVariables>(WalletTopUpRequestDetailsDocument, options);
+      }
+export function useWalletTopUpRequestDetailsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<Types.WalletTopUpRequestDetailsQuery, Types.WalletTopUpRequestDetailsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<Types.WalletTopUpRequestDetailsQuery, Types.WalletTopUpRequestDetailsQueryVariables>(WalletTopUpRequestDetailsDocument, options);
+        }
+export type WalletTopUpRequestDetailsQueryHookResult = ReturnType<typeof useWalletTopUpRequestDetailsQuery>;
+export type WalletTopUpRequestDetailsLazyQueryHookResult = ReturnType<typeof useWalletTopUpRequestDetailsLazyQuery>;
+export type WalletTopUpRequestDetailsQueryResult = Apollo.QueryResult<Types.WalletTopUpRequestDetailsQuery, Types.WalletTopUpRequestDetailsQueryVariables>;
+export const UserWalletDocument = gql`
+    query UserWallet($userId: ID!, $currency: String!) {
+  user(id: $userId) {
+    id
+    wallet(currency: $currency) {
+      ...WalletDetails
+    }
+  }
+}
+    ${WalletDetailsFragmentDoc}`;
+
+/**
+ * __useUserWalletQuery__
+ *
+ * To run a query within a React component, call `useUserWalletQuery` and pass it any options that fit your needs.
+ * When your component renders, `useUserWalletQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useUserWalletQuery({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *      currency: // value for 'currency'
+ *   },
+ * });
+ */
+export function useUserWalletQuery(baseOptions: ApolloReactHooks.QueryHookOptions<Types.UserWalletQuery, Types.UserWalletQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<Types.UserWalletQuery, Types.UserWalletQueryVariables>(UserWalletDocument, options);
+      }
+export function useUserWalletLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<Types.UserWalletQuery, Types.UserWalletQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<Types.UserWalletQuery, Types.UserWalletQueryVariables>(UserWalletDocument, options);
+        }
+export type UserWalletQueryHookResult = ReturnType<typeof useUserWalletQuery>;
+export type UserWalletLazyQueryHookResult = ReturnType<typeof useUserWalletLazyQuery>;
+export type UserWalletQueryResult = Apollo.QueryResult<Types.UserWalletQuery, Types.UserWalletQueryVariables>;
 export const WarehouseDeleteDocument = gql`
     mutation WarehouseDelete($id: ID!) {
   deleteWarehouse(id: $id) {

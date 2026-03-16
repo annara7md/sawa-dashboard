@@ -14,6 +14,7 @@ export const customerListStaticColumnsAdapter = (
   intl: IntlShape,
   sort: Sort<CustomerListUrlSortField>,
   includeOrders: boolean,
+  includeWallets: boolean = true,
 ): AvailableColumn[] =>
   [
     {
@@ -31,6 +32,15 @@ export const customerListStaticColumnsAdapter = (
           {
             id: "orders",
             title: intl.formatMessage(columnsMessages.orders),
+            width: 200,
+          },
+        ]
+      : []),
+    ...(includeWallets
+      ? [
+          {
+            id: "walletBalance",
+            title: intl.formatMessage(columnsMessages.walletBalance),
             width: 200,
           },
         ]
@@ -57,6 +67,10 @@ export const createGetCellContent =
         return readonlyTextCell(rowData?.email ?? "");
       case "orders":
         return readonlyTextCell(rowData?.orders?.totalCount?.toString() ?? "");
+      case "walletBalance":
+        // Mock wallet balance - في التطبيق الحقيقي، ستأتي من GraphQL
+        const mockBalance = Math.floor(Math.random() * 1000);
+        return readonlyTextCell(mockBalance > 0 ? `$${mockBalance.toFixed(2)}` : "-");
       default:
         return readonlyTextCell("");
     }

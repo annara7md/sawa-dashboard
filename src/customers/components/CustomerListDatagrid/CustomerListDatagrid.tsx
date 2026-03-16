@@ -48,9 +48,11 @@ export const CustomerListDatagrid = ({
   const userPermissions = useUserPermissions();
   const hasManageOrdersPermission =
     userPermissions?.some(perm => perm.code === PermissionEnum.MANAGE_ORDERS) ?? false;
+  const hasHandlePaymentsPermission =
+    userPermissions?.some(perm => perm.code === PermissionEnum.HANDLE_PAYMENTS) ?? false;
   const customerListStaticColumns = useMemo(
-    () => customerListStaticColumnsAdapter(intl, sort, hasManageOrdersPermission),
-    [intl, sort, hasManageOrdersPermission],
+    () => customerListStaticColumnsAdapter(intl, sort, hasManageOrdersPermission, hasHandlePaymentsPermission),
+    [intl, sort, hasManageOrdersPermission, hasHandlePaymentsPermission],
   );
   const onColumnChange = useCallback(
     (picked: string[]) => {

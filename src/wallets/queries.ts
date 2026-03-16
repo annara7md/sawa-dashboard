@@ -61,7 +61,7 @@ export const walletTopUpRequestListQuery = gql`
     $filter: WalletTopUpRequestFilterInput
     $sortBy: WalletTopUpRequestSortingInput
   ) {
-    walletTopUpRequests(
+    walletTopupRequests(
       first: $first
       after: $after
       last: $last
@@ -89,7 +89,7 @@ export const walletTopUpRequestListQuery = gql`
 // Get single top-up request details
 export const walletTopUpRequestDetailsQuery = gql`
   query WalletTopUpRequestDetails($id: ID!) {
-    walletTopUpRequest(id: $id) {
+    walletTopupRequest(id: $id) {
       ...WalletTopUpRequest
       events {
         id

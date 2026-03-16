@@ -1,0 +1,1 @@
+export { WalletEvents } from "./WalletEvents";

@@ -1163,6 +1163,29 @@ import type {
   VoucherTranslation,
   VoucherUpdate,
   VoucherUpdated,
+  Wallet,
+  WalletApplyToCheckout,
+  WalletBalanceType,
+  WalletCountableConnection,
+  WalletCountableEdge,
+  WalletEntry,
+  WalletError,
+  WalletEvent,
+  WalletFilterInput,
+  WalletManualAdjustment,
+  WalletOrderRefund,
+  WalletRefund,
+  WalletRemoveFromCheckout,
+  WalletSortingInput,
+  WalletTopUpApprove,
+  WalletTopUpReject,
+  WalletTopUpRequest,
+  WalletTopUpRequestCountableConnection,
+  WalletTopUpRequestCountableEdge,
+  WalletTopUpRequestCreate,
+  WalletTopUpRequestCreateInput,
+  WalletTopUpRequestFilterInput,
+  WalletTopUpRequestSortingInput,
   Warehouse,
   WarehouseCountableConnection,
   WarehouseCountableEdge,
@@ -7399,6 +7422,10 @@ export type OptionalCheckout = {
   voucher?: Maybe<OptionalVoucher> | undefined;
   /** The code of voucher assigned to the checkout. */
   voucherCode?: Checkout['voucherCode'] | undefined;
+  /** Amount reserved from user's wallet for this checkout. */
+  walletAmount?: Maybe<OptionalMoney> | undefined;
+  /** Wallet reservation ID for this checkout. */
+  walletReservationId?: Checkout['walletReservationId'] | undefined;
 };
 
 /**
@@ -17852,6 +17879,56 @@ export type OptionalMutation = {
  */
   voucherUpdate?: Maybe<OptionalVoucherUpdate> | undefined;
   /**
+ * Apply wallet balance to checkout.
+ *
+ * Added in Saleor 3.20.
+ */
+  walletApplyToCheckout?: Maybe<OptionalWalletApplyToCheckout> | undefined;
+  /**
+ * Create manual wallet balance adjustment. Staff only.
+ *
+ * Requires one of the following permissions: HANDLE_PAYMENTS.
+ */
+  walletManualAdjustment?: Maybe<OptionalWalletManualAdjustment> | undefined;
+  /**
+ * Refund order amount to customer's wallet.
+ *
+ * Added in Saleor 3.20.
+ *
+ * Requires one of the following permissions: HANDLE_PAYMENTS.
+ */
+  walletOrderRefund?: Maybe<OptionalWalletOrderRefund> | undefined;
+  /**
+ * Refund amount back to wallet.
+ *
+ * Requires one of the following permissions: HANDLE_PAYMENTS.
+ */
+  walletRefund?: Maybe<OptionalWalletRefund> | undefined;
+  /**
+ * Remove wallet balance from checkout.
+ *
+ * Added in Saleor 3.20.
+ */
+  walletRemoveFromCheckout?: Maybe<OptionalWalletRemoveFromCheckout> | undefined;
+  /**
+ * Approve wallet top-up request and credit wallet.
+ *
+ * Requires one of the following permissions: HANDLE_PAYMENTS.
+ */
+  walletTopupApprove?: Maybe<OptionalWalletTopUpApprove> | undefined;
+  /**
+ * Reject wallet top-up request.
+ *
+ * Requires one of the following permissions: HANDLE_PAYMENTS.
+ */
+  walletTopupReject?: Maybe<OptionalWalletTopUpReject> | undefined;
+  /**
+ * Create wallet top-up request.
+ *
+ * Requires one of the following permissions: AUTHENTICATED_USER.
+ */
+  walletTopupRequestCreate?: Maybe<OptionalWalletTopUpRequestCreate> | undefined;
+  /**
  * Creates a new webhook subscription.
  *
  * Requires one of the following permissions: MANAGE_APPS, AUTHENTICATED_APP.
@@ -17911,7 +17988,7 @@ export const defineNameTranslationInputFactory: DefineTypeFactoryInterface<
 > = defineTypeFactory;
 
 /** An object with an ID */
-export type OptionalNode = OptionalAddress | OptionalAllocation | OptionalApp | OptionalAppExtension | OptionalAppInstallation | OptionalAppProblem | OptionalAppToken | OptionalAttribute | OptionalAttributeTranslatableContent | OptionalAttributeTranslation | OptionalAttributeValue | OptionalAttributeValueTranslatableContent | OptionalAttributeValueTranslation | OptionalBankTransferReceipt | OptionalCategory | OptionalCategoryTranslatableContent | OptionalCategoryTranslation | OptionalChannel | OptionalCheckout | OptionalCheckoutLine | OptionalCollection | OptionalCollectionChannelListing | OptionalCollectionTranslatableContent | OptionalCollectionTranslation | OptionalCustomerEvent | OptionalDigitalContent | OptionalDigitalContentUrl | OptionalEventDelivery | OptionalEventDeliveryAttempt | OptionalExportEvent | OptionalExportFile | OptionalFulfillment | OptionalFulfillmentLine | OptionalGiftCard | OptionalGiftCardEvent | OptionalGiftCardTag | OptionalGroup | OptionalInvoice | OptionalMenu | OptionalMenuItem | OptionalMenuItemTranslatableContent | OptionalMenuItemTranslation | OptionalOrder | OptionalOrderDiscount | OptionalOrderEvent | OptionalOrderLine | OptionalPage | OptionalPageTranslatableContent | OptionalPageTranslation | OptionalPageType | OptionalPayment | OptionalProduct | OptionalProductChannelListing | OptionalProductMedia | OptionalProductTranslatableContent | OptionalProductTranslation | OptionalProductType | OptionalProductVariant | OptionalProductVariantChannelListing | OptionalProductVariantTranslatableContent | OptionalProductVariantTranslation | OptionalPromotion | OptionalPromotionCreatedEvent | OptionalPromotionEndedEvent | OptionalPromotionRule | OptionalPromotionRuleCreatedEvent | OptionalPromotionRuleDeletedEvent | OptionalPromotionRuleTranslatableContent | OptionalPromotionRuleTranslation | OptionalPromotionRuleUpdatedEvent | OptionalPromotionStartedEvent | OptionalPromotionTranslatableContent | OptionalPromotionTranslation | OptionalPromotionUpdatedEvent | OptionalSale | OptionalSaleChannelListing | OptionalSaleTranslatableContent | OptionalSaleTranslation | OptionalShippingMethod | OptionalShippingMethodChannelListing | OptionalShippingMethodPostalCodeRule | OptionalShippingMethodTranslatableContent | OptionalShippingMethodTranslation | OptionalShippingMethodType | OptionalShippingZone | OptionalShopTranslation | OptionalStaffNotificationRecipient | OptionalStock | OptionalTaxClass | OptionalTaxConfiguration | OptionalTransaction | OptionalTransactionEvent | OptionalTransactionItem | OptionalUser | OptionalVoucher | OptionalVoucherChannelListing | OptionalVoucherTranslatableContent | OptionalVoucherTranslation | OptionalWarehouse | OptionalWebhook;
+export type OptionalNode = OptionalAddress | OptionalAllocation | OptionalApp | OptionalAppExtension | OptionalAppInstallation | OptionalAppProblem | OptionalAppToken | OptionalAttribute | OptionalAttributeTranslatableContent | OptionalAttributeTranslation | OptionalAttributeValue | OptionalAttributeValueTranslatableContent | OptionalAttributeValueTranslation | OptionalBankTransferReceipt | OptionalCategory | OptionalCategoryTranslatableContent | OptionalCategoryTranslation | OptionalChannel | OptionalCheckout | OptionalCheckoutLine | OptionalCollection | OptionalCollectionChannelListing | OptionalCollectionTranslatableContent | OptionalCollectionTranslation | OptionalCustomerEvent | OptionalDigitalContent | OptionalDigitalContentUrl | OptionalEventDelivery | OptionalEventDeliveryAttempt | OptionalExportEvent | OptionalExportFile | OptionalFulfillment | OptionalFulfillmentLine | OptionalGiftCard | OptionalGiftCardEvent | OptionalGiftCardTag | OptionalGroup | OptionalInvoice | OptionalMenu | OptionalMenuItem | OptionalMenuItemTranslatableContent | OptionalMenuItemTranslation | OptionalOrder | OptionalOrderDiscount | OptionalOrderEvent | OptionalOrderLine | OptionalPage | OptionalPageTranslatableContent | OptionalPageTranslation | OptionalPageType | OptionalPayment | OptionalProduct | OptionalProductChannelListing | OptionalProductMedia | OptionalProductTranslatableContent | OptionalProductTranslation | OptionalProductType | OptionalProductVariant | OptionalProductVariantChannelListing | OptionalProductVariantTranslatableContent | OptionalProductVariantTranslation | OptionalPromotion | OptionalPromotionCreatedEvent | OptionalPromotionEndedEvent | OptionalPromotionRule | OptionalPromotionRuleCreatedEvent | OptionalPromotionRuleDeletedEvent | OptionalPromotionRuleTranslatableContent | OptionalPromotionRuleTranslation | OptionalPromotionRuleUpdatedEvent | OptionalPromotionStartedEvent | OptionalPromotionTranslatableContent | OptionalPromotionTranslation | OptionalPromotionUpdatedEvent | OptionalSale | OptionalSaleChannelListing | OptionalSaleTranslatableContent | OptionalSaleTranslation | OptionalShippingMethod | OptionalShippingMethodChannelListing | OptionalShippingMethodPostalCodeRule | OptionalShippingMethodTranslatableContent | OptionalShippingMethodTranslation | OptionalShippingMethodType | OptionalShippingZone | OptionalShopTranslation | OptionalStaffNotificationRecipient | OptionalStock | OptionalTaxClass | OptionalTaxConfiguration | OptionalTransaction | OptionalTransactionEvent | OptionalTransactionItem | OptionalUser | OptionalVoucher | OptionalVoucherChannelListing | OptionalVoucherTranslatableContent | OptionalVoucherTranslation | OptionalWallet | OptionalWalletEntry | OptionalWalletEvent | OptionalWalletTopUpRequest | OptionalWarehouse | OptionalWebhook;
 
 /**
  * An object with attributes.
@@ -17920,7 +17997,7 @@ export type OptionalNode = OptionalAddress | OptionalAllocation | OptionalApp | 
  */
 export type OptionalObjectWithAttributes = OptionalPage | OptionalProduct | OptionalProductVariant;
 
-export type OptionalObjectWithMetadata = OptionalAddress | OptionalApp | OptionalAttribute | OptionalCategory | OptionalChannel | OptionalCheckout | OptionalCheckoutLine | OptionalCollection | OptionalDigitalContent | OptionalFulfillment | OptionalGiftCard | OptionalInvoice | OptionalMenu | OptionalMenuItem | OptionalOrder | OptionalOrderLine | OptionalPage | OptionalPageType | OptionalPayment | OptionalProduct | OptionalProductMedia | OptionalProductType | OptionalProductVariant | OptionalPromotion | OptionalSale | OptionalShippingMethod | OptionalShippingMethodType | OptionalShippingZone | OptionalShop | OptionalTaxClass | OptionalTaxConfiguration | OptionalTransactionItem | OptionalUser | OptionalVoucher | OptionalWarehouse;
+export type OptionalObjectWithMetadata = OptionalAddress | OptionalApp | OptionalAttribute | OptionalCategory | OptionalChannel | OptionalCheckout | OptionalCheckoutLine | OptionalCollection | OptionalDigitalContent | OptionalFulfillment | OptionalGiftCard | OptionalInvoice | OptionalMenu | OptionalMenuItem | OptionalOrder | OptionalOrderLine | OptionalPage | OptionalPageType | OptionalPayment | OptionalProduct | OptionalProductMedia | OptionalProductType | OptionalProductVariant | OptionalPromotion | OptionalSale | OptionalShippingMethod | OptionalShippingMethodType | OptionalShippingZone | OptionalShop | OptionalTaxClass | OptionalTaxConfiguration | OptionalTransactionItem | OptionalUser | OptionalVoucher | OptionalWallet | OptionalWalletTopUpRequest | OptionalWarehouse;
 
 /** Represents an order in the shop. */
 export type OptionalOrder = {
@@ -29146,6 +29223,30 @@ export type OptionalQuery = {
  */
   vouchers?: Maybe<OptionalVoucherCountableConnection> | undefined;
   /**
+ * Look up a wallet by ID.
+ *
+ * Requires one of the following permissions: HANDLE_PAYMENTS.
+ */
+  wallet?: Maybe<OptionalWallet> | undefined;
+  /**
+ * Look up a wallet top-up request by ID.
+ *
+ * Requires one of the following permissions: HANDLE_PAYMENTS.
+ */
+  walletTopupRequest?: Maybe<OptionalWalletTopUpRequest> | undefined;
+  /**
+ * List of wallet top-up requests.
+ *
+ * Requires one of the following permissions: HANDLE_PAYMENTS.
+ */
+  walletTopupRequests?: Maybe<OptionalWalletTopUpRequestCountableConnection> | undefined;
+  /**
+ * List of wallets.
+ *
+ * Requires one of the following permissions: HANDLE_PAYMENTS.
+ */
+  wallets?: Maybe<OptionalWalletCountableConnection> | undefined;
+  /**
  * Look up a warehouse by ID.
  *
  * Requires one of the following permissions: MANAGE_PRODUCTS, MANAGE_ORDERS, MANAGE_SHIPPING.
@@ -35130,6 +35231,8 @@ export type OptionalUser = {
   updatedAt?: User['updatedAt'] | undefined;
   /** List of user's permissions. */
   userPermissions?: Maybe<OptionalUserPermission[]> | undefined;
+  /** User's wallet for the specified currency. */
+  wallet?: Maybe<OptionalWallet> | undefined;
 };
 
 /**
@@ -36385,6 +36488,644 @@ export type OptionalVoucherUpdated = {
  */
 export const defineVoucherUpdatedFactory: DefineTypeFactoryInterface<
   OptionalVoucherUpdated,
+  {}
+> = defineTypeFactory;
+
+/** Customer wallet for stored-value account. */
+export type OptionalWallet = {
+  __typename?: 'Wallet';
+  /** Balance breakdown. */
+  balance?: OptionalWalletBalanceType | undefined;
+  /** Date and time when wallet was created. */
+  createdAt?: Wallet['createdAt'] | undefined;
+  /** Currency code for this wallet. */
+  currency?: Wallet['currency'] | undefined;
+  /** Total current balance. */
+  currentBalance?: OptionalMoney | undefined;
+  /**
+ * Ledger entries for this wallet.
+ *
+ * Requires one of the following permissions: HANDLE_PAYMENTS.
+ */
+  entries?: OptionalWalletEntry[] | undefined;
+  /**
+ * Timeline events for this wallet.
+ *
+ * Requires one of the following permissions: HANDLE_PAYMENTS.
+ */
+  events?: OptionalWalletEvent[] | undefined;
+  /** ID of the wallet. */
+  id?: Wallet['id'] | undefined;
+  /** Whether wallet is active. */
+  isActive?: Wallet['isActive'] | undefined;
+  /** List of public metadata items. Can be accessed without permissions. */
+  metadata?: OptionalMetadataItem[] | undefined;
+  /**
+ * A single key from public metadata.
+ *
+ * Tip: Use GraphQL aliases to fetch multiple keys.
+ */
+  metafield?: Wallet['metafield'] | undefined;
+  /** Public metadata. Use `keys` to control which fields you want to include. The default is to include everything. */
+  metafields?: Wallet['metafields'] | undefined;
+  /** List of private metadata items. Requires staff permissions to access. */
+  privateMetadata?: OptionalMetadataItem[] | undefined;
+  /**
+ * A single key from private metadata. Requires staff permissions to access.
+ *
+ * Tip: Use GraphQL aliases to fetch multiple keys.
+ */
+  privateMetafield?: Wallet['privateMetafield'] | undefined;
+  /** Private metadata. Requires staff permissions to access. Use `keys` to control which fields you want to include. The default is to include everything. */
+  privateMetafields?: Wallet['privateMetafields'] | undefined;
+  /** Amount currently reserved. */
+  reservedBalance?: OptionalMoney | undefined;
+  /** Available balance that can be spent. */
+  spendableBalance?: OptionalMoney | undefined;
+  /** Date and time when wallet was last updated. */
+  updatedAt?: Wallet['updatedAt'] | undefined;
+  /** User who owns this wallet. */
+  user?: OptionalUser | undefined;
+};
+
+/**
+ * Define factory for {@link Wallet} model.
+ *
+ * @param options
+ * @returns factory {@link WalletFactoryInterface}
+ */
+export const defineWalletFactory: DefineTypeFactoryInterface<
+  OptionalWallet,
+  {}
+> = defineTypeFactory;
+
+/**
+ * Apply wallet balance to checkout.
+ *
+ * Added in Saleor 3.20.
+ */
+export type OptionalWalletApplyToCheckout = {
+  __typename?: 'WalletApplyToCheckout';
+  /** Updated checkout. */
+  checkout?: Maybe<OptionalCheckout> | undefined;
+  errors?: OptionalWalletError[] | undefined;
+  walletErrors?: OptionalWalletError[] | undefined;
+};
+
+/**
+ * Define factory for {@link WalletApplyToCheckout} model.
+ *
+ * @param options
+ * @returns factory {@link WalletApplyToCheckoutFactoryInterface}
+ */
+export const defineWalletApplyToCheckoutFactory: DefineTypeFactoryInterface<
+  OptionalWalletApplyToCheckout,
+  {}
+> = defineTypeFactory;
+
+/** Wallet balance breakdown. */
+export type OptionalWalletBalanceType = {
+  __typename?: 'WalletBalanceType';
+  /** Total current balance in wallet. */
+  currentBalance?: OptionalMoney | undefined;
+  /** Amount currently reserved (held during checkout). */
+  reservedBalance?: OptionalMoney | undefined;
+  /** Available balance that can be spent (current - reserved). */
+  spendableBalance?: OptionalMoney | undefined;
+};
+
+/**
+ * Define factory for {@link WalletBalanceType} model.
+ *
+ * @param options
+ * @returns factory {@link WalletBalanceTypeFactoryInterface}
+ */
+export const defineWalletBalanceTypeFactory: DefineTypeFactoryInterface<
+  OptionalWalletBalanceType,
+  {}
+> = defineTypeFactory;
+
+export type OptionalWalletCountableConnection = {
+  __typename?: 'WalletCountableConnection';
+  edges?: OptionalWalletCountableEdge[] | undefined;
+  /** Pagination data for this connection. */
+  pageInfo?: OptionalPageInfo | undefined;
+  /** A total count of items in the collection. */
+  totalCount?: WalletCountableConnection['totalCount'] | undefined;
+};
+
+/**
+ * Define factory for {@link WalletCountableConnection} model.
+ *
+ * @param options
+ * @returns factory {@link WalletCountableConnectionFactoryInterface}
+ */
+export const defineWalletCountableConnectionFactory: DefineTypeFactoryInterface<
+  OptionalWalletCountableConnection,
+  {}
+> = defineTypeFactory;
+
+export type OptionalWalletCountableEdge = {
+  __typename?: 'WalletCountableEdge';
+  /** A cursor for use in pagination. */
+  cursor?: WalletCountableEdge['cursor'] | undefined;
+  /** The item at the end of the edge. */
+  node?: OptionalWallet | undefined;
+};
+
+/**
+ * Define factory for {@link WalletCountableEdge} model.
+ *
+ * @param options
+ * @returns factory {@link WalletCountableEdgeFactoryInterface}
+ */
+export const defineWalletCountableEdgeFactory: DefineTypeFactoryInterface<
+  OptionalWalletCountableEdge,
+  {}
+> = defineTypeFactory;
+
+/** Immutable ledger entry for wallet balance changes. */
+export type OptionalWalletEntry = {
+  __typename?: 'WalletEntry';
+  /** Amount of this entry. */
+  amount?: OptionalMoney | undefined;
+  /** Wallet balance after this entry. */
+  balanceAfter?: OptionalMoney | undefined;
+  /** Related checkout if applicable. */
+  checkout?: Maybe<OptionalCheckout> | undefined;
+  /** Date and time when entry was created. */
+  createdAt?: WalletEntry['createdAt'] | undefined;
+  /** App that created this entry. */
+  createdByApp?: Maybe<OptionalApp> | undefined;
+  /** User who created this entry. */
+  createdByUser?: Maybe<OptionalUser> | undefined;
+  /** Type of entry (credit, debit, reserve, release, refund, adjustment). */
+  entryType?: WalletEntry['entryType'] | undefined;
+  /** ID of the entry. */
+  id?: WalletEntry['id'] | undefined;
+  /** Additional note. */
+  note?: WalletEntry['note'] | undefined;
+  /** Related order if applicable. */
+  order?: Maybe<OptionalOrder> | undefined;
+  /** Reason for this entry. */
+  reason?: WalletEntry['reason'] | undefined;
+  /** Reserved balance after this entry. */
+  reservedAfter?: OptionalMoney | undefined;
+  /** Related top-up request if applicable. */
+  topupRequest?: Maybe<OptionalWalletTopUpRequest> | undefined;
+  /** Wallet this entry belongs to. */
+  wallet?: OptionalWallet | undefined;
+};
+
+/**
+ * Define factory for {@link WalletEntry} model.
+ *
+ * @param options
+ * @returns factory {@link WalletEntryFactoryInterface}
+ */
+export const defineWalletEntryFactory: DefineTypeFactoryInterface<
+  OptionalWalletEntry,
+  {}
+> = defineTypeFactory;
+
+/** Wallet error type. */
+export type OptionalWalletError = {
+  __typename?: 'WalletError';
+  /** The error code. */
+  code?: WalletError['code'] | undefined;
+  /** Name of a field that caused the error. A value of `null` indicates that the error isn't associated with a particular field. */
+  field?: WalletError['field'] | undefined;
+  /** The error message. */
+  message?: WalletError['message'] | undefined;
+};
+
+/**
+ * Define factory for {@link WalletError} model.
+ *
+ * @param options
+ * @returns factory {@link WalletErrorFactoryInterface}
+ */
+export const defineWalletErrorFactory: DefineTypeFactoryInterface<
+  OptionalWalletError,
+  {}
+> = defineTypeFactory;
+
+/** Timeline event for wallet activity. */
+export type OptionalWalletEvent = {
+  __typename?: 'WalletEvent';
+  /** App that performed the action. */
+  app?: Maybe<OptionalApp> | undefined;
+  /** Related checkout if applicable. */
+  checkout?: Maybe<OptionalCheckout> | undefined;
+  /** Date when event happened. */
+  date?: WalletEvent['date'] | undefined;
+  /** ID of the event. */
+  id?: WalletEvent['id'] | undefined;
+  /** Related order if applicable. */
+  order?: Maybe<OptionalOrder> | undefined;
+  /** Event parameters. */
+  parameters?: WalletEvent['parameters'] | undefined;
+  /** Related top-up request if applicable. */
+  topupRequest?: Maybe<OptionalWalletTopUpRequest> | undefined;
+  /** Wallet event type. */
+  type?: WalletEvent['type'] | undefined;
+  /** User who performed the action. */
+  user?: Maybe<OptionalUser> | undefined;
+  /** Wallet this event belongs to. */
+  wallet?: OptionalWallet | undefined;
+};
+
+/**
+ * Define factory for {@link WalletEvent} model.
+ *
+ * @param options
+ * @returns factory {@link WalletEventFactoryInterface}
+ */
+export const defineWalletEventFactory: DefineTypeFactoryInterface<
+  OptionalWalletEvent,
+  {}
+> = defineTypeFactory;
+
+/** Input for filtering wallets. */
+export type OptionalWalletFilterInput = {
+  __typename?: 'WalletFilterInput';
+  /** Filter by currency code. */
+  currency?: WalletFilterInput['currency'] | undefined;
+  /** Filter by active status. */
+  isActive?: WalletFilterInput['isActive'] | undefined;
+  metadata?: Maybe<OptionalMetadataFilter[]> | undefined;
+  /** Filter by user ID. */
+  user?: WalletFilterInput['user'] | undefined;
+};
+
+/**
+ * Define factory for {@link WalletFilterInput} model.
+ *
+ * @param options
+ * @returns factory {@link WalletFilterInputFactoryInterface}
+ */
+export const defineWalletFilterInputFactory: DefineTypeFactoryInterface<
+  OptionalWalletFilterInput,
+  {}
+> = defineTypeFactory;
+
+/**
+ * Create manual wallet balance adjustment. Staff only.
+ *
+ * Requires one of the following permissions: HANDLE_PAYMENTS.
+ */
+export type OptionalWalletManualAdjustment = {
+  __typename?: 'WalletManualAdjustment';
+  errors?: OptionalWalletError[] | undefined;
+  /** Updated wallet. */
+  wallet?: Maybe<OptionalWallet> | undefined;
+  walletErrors?: OptionalWalletError[] | undefined;
+};
+
+/**
+ * Define factory for {@link WalletManualAdjustment} model.
+ *
+ * @param options
+ * @returns factory {@link WalletManualAdjustmentFactoryInterface}
+ */
+export const defineWalletManualAdjustmentFactory: DefineTypeFactoryInterface<
+  OptionalWalletManualAdjustment,
+  {}
+> = defineTypeFactory;
+
+/**
+ * Refund order amount to customer's wallet.
+ *
+ * Added in Saleor 3.20.
+ *
+ * Requires one of the following permissions: HANDLE_PAYMENTS.
+ */
+export type OptionalWalletOrderRefund = {
+  __typename?: 'WalletOrderRefund';
+  errors?: OptionalWalletError[] | undefined;
+  /** Updated order. */
+  order?: Maybe<OptionalOrder> | undefined;
+  walletErrors?: OptionalWalletError[] | undefined;
+};
+
+/**
+ * Define factory for {@link WalletOrderRefund} model.
+ *
+ * @param options
+ * @returns factory {@link WalletOrderRefundFactoryInterface}
+ */
+export const defineWalletOrderRefundFactory: DefineTypeFactoryInterface<
+  OptionalWalletOrderRefund,
+  {}
+> = defineTypeFactory;
+
+/**
+ * Refund amount back to wallet.
+ *
+ * Requires one of the following permissions: HANDLE_PAYMENTS.
+ */
+export type OptionalWalletRefund = {
+  __typename?: 'WalletRefund';
+  errors?: OptionalWalletError[] | undefined;
+  /** Updated wallet. */
+  wallet?: Maybe<OptionalWallet> | undefined;
+  walletErrors?: OptionalWalletError[] | undefined;
+};
+
+/**
+ * Define factory for {@link WalletRefund} model.
+ *
+ * @param options
+ * @returns factory {@link WalletRefundFactoryInterface}
+ */
+export const defineWalletRefundFactory: DefineTypeFactoryInterface<
+  OptionalWalletRefund,
+  {}
+> = defineTypeFactory;
+
+/**
+ * Remove wallet balance from checkout.
+ *
+ * Added in Saleor 3.20.
+ */
+export type OptionalWalletRemoveFromCheckout = {
+  __typename?: 'WalletRemoveFromCheckout';
+  /** Updated checkout. */
+  checkout?: Maybe<OptionalCheckout> | undefined;
+  errors?: OptionalWalletError[] | undefined;
+  walletErrors?: OptionalWalletError[] | undefined;
+};
+
+/**
+ * Define factory for {@link WalletRemoveFromCheckout} model.
+ *
+ * @param options
+ * @returns factory {@link WalletRemoveFromCheckoutFactoryInterface}
+ */
+export const defineWalletRemoveFromCheckoutFactory: DefineTypeFactoryInterface<
+  OptionalWalletRemoveFromCheckout,
+  {}
+> = defineTypeFactory;
+
+/** Input for sorting wallets. */
+export type OptionalWalletSortingInput = {
+  __typename?: 'WalletSortingInput';
+  /** Specifies the direction in which to sort. */
+  direction?: WalletSortingInput['direction'] | undefined;
+};
+
+/**
+ * Define factory for {@link WalletSortingInput} model.
+ *
+ * @param options
+ * @returns factory {@link WalletSortingInputFactoryInterface}
+ */
+export const defineWalletSortingInputFactory: DefineTypeFactoryInterface<
+  OptionalWalletSortingInput,
+  {}
+> = defineTypeFactory;
+
+/**
+ * Approve wallet top-up request and credit wallet.
+ *
+ * Requires one of the following permissions: HANDLE_PAYMENTS.
+ */
+export type OptionalWalletTopUpApprove = {
+  __typename?: 'WalletTopUpApprove';
+  errors?: OptionalWalletError[] | undefined;
+  /** Approved top-up request. */
+  topupRequest?: Maybe<OptionalWalletTopUpRequest> | undefined;
+  walletErrors?: OptionalWalletError[] | undefined;
+};
+
+/**
+ * Define factory for {@link WalletTopUpApprove} model.
+ *
+ * @param options
+ * @returns factory {@link WalletTopUpApproveFactoryInterface}
+ */
+export const defineWalletTopUpApproveFactory: DefineTypeFactoryInterface<
+  OptionalWalletTopUpApprove,
+  {}
+> = defineTypeFactory;
+
+/**
+ * Reject wallet top-up request.
+ *
+ * Requires one of the following permissions: HANDLE_PAYMENTS.
+ */
+export type OptionalWalletTopUpReject = {
+  __typename?: 'WalletTopUpReject';
+  errors?: OptionalWalletError[] | undefined;
+  /** Rejected top-up request. */
+  topupRequest?: Maybe<OptionalWalletTopUpRequest> | undefined;
+  walletErrors?: OptionalWalletError[] | undefined;
+};
+
+/**
+ * Define factory for {@link WalletTopUpReject} model.
+ *
+ * @param options
+ * @returns factory {@link WalletTopUpRejectFactoryInterface}
+ */
+export const defineWalletTopUpRejectFactory: DefineTypeFactoryInterface<
+  OptionalWalletTopUpReject,
+  {}
+> = defineTypeFactory;
+
+/** Request to top up wallet balance via bank transfer. */
+export type OptionalWalletTopUpRequest = {
+  __typename?: 'WalletTopUpRequest';
+  /** Amount to top up. */
+  amount?: OptionalMoney | undefined;
+  /** External bank transfer reference number. */
+  bankReference?: WalletTopUpRequest['bankReference'] | undefined;
+  /** Date and time when request was created. */
+  createdAt?: WalletTopUpRequest['createdAt'] | undefined;
+  /** Note from customer about this top-up. */
+  customerNote?: WalletTopUpRequest['customerNote'] | undefined;
+  /**
+ * Events related to this top-up request.
+ *
+ * Requires one of the following permissions: HANDLE_PAYMENTS.
+ */
+  events?: OptionalWalletEvent[] | undefined;
+  /** ID of the request. */
+  id?: WalletTopUpRequest['id'] | undefined;
+  /** List of public metadata items. Can be accessed without permissions. */
+  metadata?: OptionalMetadataItem[] | undefined;
+  /**
+ * A single key from public metadata.
+ *
+ * Tip: Use GraphQL aliases to fetch multiple keys.
+ */
+  metafield?: WalletTopUpRequest['metafield'] | undefined;
+  /** Public metadata. Use `keys` to control which fields you want to include. The default is to include everything. */
+  metafields?: WalletTopUpRequest['metafields'] | undefined;
+  /** List of private metadata items. Requires staff permissions to access. */
+  privateMetadata?: OptionalMetadataItem[] | undefined;
+  /**
+ * A single key from private metadata. Requires staff permissions to access.
+ *
+ * Tip: Use GraphQL aliases to fetch multiple keys.
+ */
+  privateMetafield?: WalletTopUpRequest['privateMetafield'] | undefined;
+  /** Private metadata. Requires staff permissions to access. Use `keys` to control which fields you want to include. The default is to include everything. */
+  privateMetafields?: WalletTopUpRequest['privateMetafields'] | undefined;
+  /** Reason for rejection (visible to customer). */
+  rejectionReason?: WalletTopUpRequest['rejectionReason'] | undefined;
+  /** Date and time when request was reviewed. */
+  reviewedAt?: WalletTopUpRequest['reviewedAt'] | undefined;
+  /** Staff user who reviewed this request. */
+  reviewedBy?: Maybe<OptionalUser> | undefined;
+  /** App that reviewed this request. */
+  reviewedByApp?: Maybe<OptionalApp> | undefined;
+  /** Internal note from staff reviewer. */
+  staffNote?: WalletTopUpRequest['staffNote'] | undefined;
+  /** Status of the request. */
+  status?: WalletTopUpRequest['status'] | undefined;
+  /** Internal transfer reference. */
+  transferReference?: WalletTopUpRequest['transferReference'] | undefined;
+  /** Date and time when request was last updated. */
+  updatedAt?: WalletTopUpRequest['updatedAt'] | undefined;
+  /** Wallet to top up. */
+  wallet?: OptionalWallet | undefined;
+};
+
+/**
+ * Define factory for {@link WalletTopUpRequest} model.
+ *
+ * @param options
+ * @returns factory {@link WalletTopUpRequestFactoryInterface}
+ */
+export const defineWalletTopUpRequestFactory: DefineTypeFactoryInterface<
+  OptionalWalletTopUpRequest,
+  {}
+> = defineTypeFactory;
+
+export type OptionalWalletTopUpRequestCountableConnection = {
+  __typename?: 'WalletTopUpRequestCountableConnection';
+  edges?: OptionalWalletTopUpRequestCountableEdge[] | undefined;
+  /** Pagination data for this connection. */
+  pageInfo?: OptionalPageInfo | undefined;
+  /** A total count of items in the collection. */
+  totalCount?: WalletTopUpRequestCountableConnection['totalCount'] | undefined;
+};
+
+/**
+ * Define factory for {@link WalletTopUpRequestCountableConnection} model.
+ *
+ * @param options
+ * @returns factory {@link WalletTopUpRequestCountableConnectionFactoryInterface}
+ */
+export const defineWalletTopUpRequestCountableConnectionFactory: DefineTypeFactoryInterface<
+  OptionalWalletTopUpRequestCountableConnection,
+  {}
+> = defineTypeFactory;
+
+export type OptionalWalletTopUpRequestCountableEdge = {
+  __typename?: 'WalletTopUpRequestCountableEdge';
+  /** A cursor for use in pagination. */
+  cursor?: WalletTopUpRequestCountableEdge['cursor'] | undefined;
+  /** The item at the end of the edge. */
+  node?: OptionalWalletTopUpRequest | undefined;
+};
+
+/**
+ * Define factory for {@link WalletTopUpRequestCountableEdge} model.
+ *
+ * @param options
+ * @returns factory {@link WalletTopUpRequestCountableEdgeFactoryInterface}
+ */
+export const defineWalletTopUpRequestCountableEdgeFactory: DefineTypeFactoryInterface<
+  OptionalWalletTopUpRequestCountableEdge,
+  {}
+> = defineTypeFactory;
+
+/**
+ * Create wallet top-up request.
+ *
+ * Requires one of the following permissions: AUTHENTICATED_USER.
+ */
+export type OptionalWalletTopUpRequestCreate = {
+  __typename?: 'WalletTopUpRequestCreate';
+  errors?: OptionalWalletError[] | undefined;
+  /** Created top-up request. */
+  topupRequest?: Maybe<OptionalWalletTopUpRequest> | undefined;
+  walletErrors?: OptionalWalletError[] | undefined;
+};
+
+/**
+ * Define factory for {@link WalletTopUpRequestCreate} model.
+ *
+ * @param options
+ * @returns factory {@link WalletTopUpRequestCreateFactoryInterface}
+ */
+export const defineWalletTopUpRequestCreateFactory: DefineTypeFactoryInterface<
+  OptionalWalletTopUpRequestCreate,
+  {}
+> = defineTypeFactory;
+
+/** Input for creating wallet top-up request. */
+export type OptionalWalletTopUpRequestCreateInput = {
+  __typename?: 'WalletTopUpRequestCreateInput';
+  /** Amount to top up. */
+  amount?: WalletTopUpRequestCreateInput['amount'] | undefined;
+  /** External bank transfer reference number. */
+  bankReference?: WalletTopUpRequestCreateInput['bankReference'] | undefined;
+  /** Currency code for the wallet. */
+  currency?: WalletTopUpRequestCreateInput['currency'] | undefined;
+  /** Note from customer about this top-up. */
+  customerNote?: WalletTopUpRequestCreateInput['customerNote'] | undefined;
+};
+
+/**
+ * Define factory for {@link WalletTopUpRequestCreateInput} model.
+ *
+ * @param options
+ * @returns factory {@link WalletTopUpRequestCreateInputFactoryInterface}
+ */
+export const defineWalletTopUpRequestCreateInputFactory: DefineTypeFactoryInterface<
+  OptionalWalletTopUpRequestCreateInput,
+  {}
+> = defineTypeFactory;
+
+/** Input for filtering wallet top-up requests. */
+export type OptionalWalletTopUpRequestFilterInput = {
+  __typename?: 'WalletTopUpRequestFilterInput';
+  metadata?: Maybe<OptionalMetadataFilter[]> | undefined;
+  /** Filter by status. */
+  status?: WalletTopUpRequestFilterInput['status'] | undefined;
+  /** Filter by wallet ID. */
+  wallet?: WalletTopUpRequestFilterInput['wallet'] | undefined;
+};
+
+/**
+ * Define factory for {@link WalletTopUpRequestFilterInput} model.
+ *
+ * @param options
+ * @returns factory {@link WalletTopUpRequestFilterInputFactoryInterface}
+ */
+export const defineWalletTopUpRequestFilterInputFactory: DefineTypeFactoryInterface<
+  OptionalWalletTopUpRequestFilterInput,
+  {}
+> = defineTypeFactory;
+
+/** Input for sorting wallet top-up requests. */
+export type OptionalWalletTopUpRequestSortingInput = {
+  __typename?: 'WalletTopUpRequestSortingInput';
+  /** Specifies the direction in which to sort. */
+  direction?: WalletTopUpRequestSortingInput['direction'] | undefined;
+};
+
+/**
+ * Define factory for {@link WalletTopUpRequestSortingInput} model.
+ *
+ * @param options
+ * @returns factory {@link WalletTopUpRequestSortingInputFactoryInterface}
+ */
+export const defineWalletTopUpRequestSortingInputFactory: DefineTypeFactoryInterface<
+  OptionalWalletTopUpRequestSortingInput,
   {}
 > = defineTypeFactory;
 

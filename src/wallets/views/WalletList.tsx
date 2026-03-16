@@ -1,4 +1,3 @@
-import { useConditionalFilterContext } from "@dashboard/components/ConditionalFilter";
 import { WindowTitle } from "@dashboard/components/WindowTitle";
 import useListSettings from "@dashboard/hooks/useListSettings";
 import useNavigator from "@dashboard/hooks/useNavigator";
@@ -19,6 +18,7 @@ import { useIntl } from "react-intl";
 import WalletListPage from "../components/WalletListPage/WalletListPage";
 import { useWalletList } from "../hooks/useWalletList";
 import { type WalletListUrlQueryParams, walletListUrl } from "../urls";
+import { getFilterOpts, getFilterQueryParam } from "./WalletList/filters";
 
 interface WalletListProps {
   params: WalletListUrlQueryParams;
@@ -46,7 +46,7 @@ const WalletList = ({ params }: WalletListProps) => {
       filter: {
         query: params.query,
         currency: params.currency,
-        isActive: params.isActive,
+        isActive: params.isActive === "true" ? true : params.isActive === "false" ? false : undefined,
       },
       sortBy: {
         field: params.sort || "CREATED_AT",
@@ -61,7 +61,7 @@ const WalletList = ({ params }: WalletListProps) => {
   const [changeFilters, resetFilters, handleSearchChange] = createFilterHandlers({
     cleanupFn: clearRowSelection,
     createUrl: walletListUrl,
-    getFilterQueryParam: () => ({}), // TODO: Implement proper filter query params
+    getFilterQueryParam,
     navigate,
     params,
     keepActiveTab: true,
@@ -77,11 +77,11 @@ const WalletList = ({ params }: WalletListProps) => {
   
   const handleSetSelectedWalletIds = useCallback(
     (rows: number[], clearSelection: () => void) => {
-      if (!wallets) {
+      if (!wallets || wallets.length === 0) {
         return;
       }
 
-      const rowsIds = rows.map(row => wallets[row]?.id).filter(id => id !== undefined);
+      const rowsIds = rows.map(row => wallets[row]?.id).filter((id): id is string => id !== undefined);
       const haveSameValues = JSON.stringify(rowsIds) === JSON.stringify(selectedRowIds);
 
       if (!haveSameValues) {
@@ -97,17 +97,19 @@ const WalletList = ({ params }: WalletListProps) => {
     <PaginatorContext.Provider value={paginationValues}>
       <WindowTitle title={intl.formatMessage(sectionNames.wallets)} />
       <WalletListPage
-        selectedFilterPreset=""
+        selectedFilterPreset={0}
+        filterOpts={getFilterOpts(params)}
         filterPresets={[]}
         initialSearch={params.query || ""}
         onSearchChange={handleSearchChange}
+        onFilterChange={changeFilters}
         onFilterPresetsAll={resetFilters}
         onFilterPresetChange={() => {}}
         onFilterPresetDelete={() => {}}
         onFilterPresetUpdate={() => {}}
         onFilterPresetPresetSave={() => {}}
         hasPresetsChanged={() => false}
-        wallets={wallets}
+        wallets={wallets || []}
         settings={settings}
         disabled={loading}
         loading={loading}

@@ -313,6 +313,10 @@
       "VoucherChannelListing",
       "VoucherTranslatableContent",
       "VoucherTranslation",
+      "Wallet",
+      "WalletEntry",
+      "WalletEvent",
+      "WalletTopUpRequest",
       "Warehouse",
       "Webhook"
     ],
@@ -356,6 +360,8 @@
       "TransactionItem",
       "User",
       "Voucher",
+      "Wallet",
+      "WalletTopUpRequest",
       "Warehouse"
     ],
     "OrderOrCheckout": [

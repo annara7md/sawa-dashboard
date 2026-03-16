@@ -1,4 +1,3 @@
-// @ts-strict-ignore
 import { TopNav } from "@dashboard/components/AppLayout/TopNav";
 import { Backlink } from "@dashboard/components/Backlink";
 import { CardSpacer } from "@dashboard/components/CardSpacer";
@@ -35,6 +34,7 @@ import CustomerDetails from "../CustomerDetails";
 import CustomerInfo from "../CustomerInfo";
 import CustomerOrders from "../CustomerOrders";
 import CustomerStats from "../CustomerStats";
+import { CustomerWallets } from "../CustomerWallets";
 
 export interface CustomerDetailsPageFormData extends MetadataFormData {
   firstName: string;
@@ -117,6 +117,10 @@ const CustomerDetailsPage = ({
                   orders={mapEdgesToItems(customer?.orders)}
                   viewAllHref={orderListUrlWithCustomerEmail(customer?.email)}
                 />
+                <CardSpacer />
+              </RequirePermissions>
+              <RequirePermissions requiredPermissions={[PermissionEnum.HANDLE_PAYMENTS]}>
+                <CustomerWallets customer={customer} loading={disabled} />
                 <CardSpacer />
               </RequirePermissions>
               <Metadata data={data} onChange={change} />
