@@ -1,0 +1,8 @@
+export const ProductsIcon = () => (
+  <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" data-macaw-ui-candidate width="20" height="20">
+    <g id="bag--bag-payment-cash-money-finance">
+      <path id="Vector" fill="#8fbffa" d="M7 14c3.77 0 6.462 -1.336 6.462 -4.308 0 -3.232 -1.615 -4.869 -4.847 -6.485l1.398 -2.184A0.699 0.699 0 0 0 9.41 0H4.843a0.7 0.7 0 0 0 -0.603 1.077l1.144 2.13C2.153 4.845 0.537 6.482 0.537 9.713 0.537 12.664 3.23 14 7 14Z" strokeWidth="1"></path>
+      <path id="Intersect" fill="#2859c5" fillRule="evenodd" d="M4.144 3.886a4.589 4.589 0 0 0 5.717 -0.004 19.828 19.828 0 0 0 -1.237 -0.67 3.344 3.344 0 0 1 -3.249 0c-0.44 0.223 -0.85 0.447 -1.23 0.674Z" clipRule="evenodd" strokeWidth="1"></path>
+    </g>
+  </svg>
+);

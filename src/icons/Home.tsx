@@ -1,0 +1,8 @@
+export const HomeIcon = () => (
+  <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" data-macaw-ui-candidate width="20" height="20">
+    <g id="home-3--home-house-roof-shelter">
+    <path id="Vector 308" fill="#8fbffa" d="M0 6.776a1 1 0 0 1 0.318 -0.731L6.675 0.12a0.5 0.5 0 0 1 0.65 0l6.357 5.925a1 1 0 0 1 0.318 0.731V12.5a1.5 1.5 0 0 1 -1.5 1.5h-11A1.5 1.5 0 0 1 0 12.5V6.776Z" strokeWidth="1"></path>
+    <path id="Intersect" fill="#2859c5" fillRule="evenodd" d="M8 14H6v-3a1 1 0 1 1 2 0v3Z" clipRule="evenodd" strokeWidth="1"></path>
+  </g>
+  </svg>
+);
